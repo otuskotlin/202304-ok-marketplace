@@ -67,6 +67,8 @@ fun Application.moduleJvm() {
             v1Offer()
         }
 
-        staticResources("static", "static")
+        static("static") {
+            resources("static")
+        }
     }
 }
