@@ -10,8 +10,9 @@ import io.ktor.server.routing.*
 import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.app.v2.v2Ad
 import ru.otus.otuskotlin.marketplace.app.v2.v2Offer
+import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 
-fun Application.module(includeContentNegotiation: Boolean = true) {
+fun Application.module(includeContentNegotiation: Boolean = true, processor: MkplAdProcessor = MkplAdProcessor()) {
     if (includeContentNegotiation) {
         install(ContentNegotiation) {
             json(apiV2Mapper)
@@ -23,8 +24,8 @@ fun Application.module(includeContentNegotiation: Boolean = true) {
             call.respondText("Hello, world!")
         }
         route("v2") {
-            v2Ad()
-            v2Offer()
+            v2Ad(processor)
+            v2Offer(processor)
         }
     }
 }
@@ -32,5 +33,5 @@ fun Application.module(includeContentNegotiation: Boolean = true) {
 fun main() {
     embeddedServer(CIO, port = 8080) {
         module()
-    } .start(wait = true)
+    }.start(wait = true)
 }

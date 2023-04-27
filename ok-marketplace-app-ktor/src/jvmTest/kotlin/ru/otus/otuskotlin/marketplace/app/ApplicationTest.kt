@@ -3,7 +3,6 @@ package ru.otus.otuskotlin.marketplace.app
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import org.junit.Test
 import kotlin.test.assertEquals

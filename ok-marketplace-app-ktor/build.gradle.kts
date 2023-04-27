@@ -66,6 +66,7 @@ kotlin {
                 implementation(ktor("auth")) // "io.ktor:ktor-auth:$ktorVersion"
 
                 implementation(project(":ok-marketplace-common"))
+                implementation(project(":ok-marketplace-biz"))
 
                 // v2 api
                 implementation(project(":ok-marketplace-api-v2-kmp"))
