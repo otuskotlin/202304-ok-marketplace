@@ -7,7 +7,7 @@ pluginManagement {
     val springDependencyManagementVersion: String by settings
     val pluginSpringVersion: String by settings
     val pluginJpa: String by settings
-//    val ktorVersion: String by settings
+    val ktorVersion: String by settings
 
     plugins {
         kotlin("jvm") version kotlinVersion apply false
@@ -19,7 +19,7 @@ pluginManagement {
         kotlin("plugin.spring") version pluginSpringVersion apply false
         kotlin("plugin.jpa") version pluginJpa apply false
 
-//        id("io.ktor.plugin") version ktorVersion apply false
+        id("io.ktor.plugin") version ktorVersion apply false
 
         id("org.openapi.generator") version openapiVersion apply false
     }

@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 import org.jetbrains.kotlin.util.suffixIfNot
 
 val ktorVersion: String by project
@@ -12,6 +14,7 @@ plugins {
     id("application")
     kotlin("plugin.serialization")
     kotlin("multiplatform")
+    id("io.ktor.plugin")
 }
 
 repositories {
@@ -19,31 +22,48 @@ repositories {
 }
 
 application {
-//    mainClass.set("io.ktor.server.netty.EngineMain")
-    mainClass.set("ru.otus.otuskotlin.marketplace.ApplicationKt")
+    mainClass.set("io.ktor.server.cio.EngineMain")
+}
+
+ktor {
+    docker {
+        localImageName.set(project.name)
+        imageTag.set(project.version.toString())
+        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
+    }
 }
 
 kotlin {
     jvm {}
     macosX64 {}
-    macosArm64 {}
-    linuxX64 {}
-
+//    macosArm64 {}
+//    linuxX64 {}
 
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
         binaries {
             executable {
-                entryPoint = "ru.otus.otuskotlin.marketplace.main"
+                entryPoint = "ru.otus.otuskotlin.marketplace.app.main"
             }
         }
     }
 
     sourceSets {
-        @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
+
+                implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
+                implementation(ktor("cio")) // "io.ktor:ktor-server-cio:$ktorVersion"
+                implementation(ktor("auth")) // "io.ktor:ktor-server-auth:$ktorVersion"
+                implementation(ktor("auto-head-response")) // "io.ktor:ktor-server-auto-head-response:$ktorVersion"
+                implementation(ktor("caching-headers")) // "io.ktor:ktor-server-caching-headers:$ktorVersion"
+                implementation(ktor("cors")) // "io.ktor:ktor-server-cors:$ktorVersion"
+                implementation(ktor("websockets")) // "io.ktor:ktor-server-websockets:$ktorVersion"
+                implementation(ktor("config-yaml")) // "io.ktor:ktor-server-config-yaml:$ktorVersion"
+                implementation(ktor("content-negotiation")) // "io.ktor:ktor-server-content-negotiation:$ktorVersion"
+                implementation(ktor("websockets")) // "io.ktor:ktor-websockets:$ktorVersion"
+                implementation(ktor("auth")) // "io.ktor:ktor-auth:$ktorVersion"
 
                 implementation(project(":ok-marketplace-common"))
 
@@ -54,52 +74,24 @@ kotlin {
                 // Stubs
                 implementation(project(":ok-marketplace-stubs"))
 
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val commonTest by getting {
             dependencies {
+                implementation(kotlin("test"))
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+
+                implementation(ktor("test-host"))
+                implementation(ktor("content-negotiation", prefix = "client-"))
+                implementation(ktor("websockets", prefix = "client-"))
             }
         }
 
-//        @Suppress("UNUSED_VARIABLE")
-//        val macosX64Main by getting {
-//            dependencies {
-//                implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
-//                implementation(ktor("cio")) // "io.ktor:ktor-server-cio:$ktorVersion"
-//                implementation(ktor("auth")) // "io.ktor:ktor-server-auth:$ktorVersion"
-//                implementation(ktor("auto-head-response")) // "io.ktor:ktor-server-auto-head-response:$ktorVersion"
-//                implementation(ktor("caching-headers")) // "io.ktor:ktor-server-caching-headers:$ktorVersion"
-//                implementation(ktor("cors")) // "io.ktor:ktor-server-cors:$ktorVersion"
-//                implementation(ktor("websockets")) // "io.ktor:ktor-server-websockets:$ktorVersion"
-//                implementation(ktor("config-yaml")) // "io.ktor:ktor-server-config-yaml:$ktorVersion"
-//                implementation(ktor("content-negotiation")) // "io.ktor:ktor-server-content-negotiation:$ktorVersion"
-//
-//                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-//                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-//
-//                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-//                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-//            }
-//        }
-//
-//        @Suppress("UNUSED_VARIABLE")
-//        val macosX64Test by getting {
-//            dependencies {
-//                implementation(kotlin("test"))
-//
-//                implementation(ktor("test-host"))
-//                implementation(ktor("content-negotiation", prefix = "client-"))
-//                implementation(ktor("websockets", prefix = "client-"))
-//            }
-//        }
-
-        @Suppress("UNUSED_VARIABLE")
         val jvmMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
@@ -132,7 +124,6 @@ kotlin {
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -142,4 +133,8 @@ kotlin {
             }
         }
     }
+}
+
+tasks.withType<Copy> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
