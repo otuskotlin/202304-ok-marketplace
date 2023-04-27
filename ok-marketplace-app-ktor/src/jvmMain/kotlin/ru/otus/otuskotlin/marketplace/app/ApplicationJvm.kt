@@ -1,4 +1,4 @@
-package ru.otus.otuskotlin.marketplace
+package ru.otus.otuskotlin.marketplace.app
 
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
@@ -16,18 +16,16 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import org.slf4j.event.Level
 import ru.otus.otuskotlin.marketplace.api.v1.apiV1Mapper
-import ru.otus.otuskotlin.marketplace.app.v2.v2Ad
-import ru.otus.otuskotlin.marketplace.app.v2.v2Offer
-import ru.otus.otuskotlin.marketplace.v1.v1Ad
-import ru.otus.otuskotlin.marketplace.v1.v1Offer
+import ru.otus.otuskotlin.marketplace.app.module as commonModule
+import ru.otus.otuskotlin.marketplace.app.v1.v1Ad
+import ru.otus.otuskotlin.marketplace.app.v1.v1Offer
 
 // function with config (application.conf)
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>): Unit = io.ktor.server.cio.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
-fun Application.module() {
-    // Generally not needed as it is replaced by a `routing`
-    install(Routing)
+fun Application.moduleJvm() {
+    commonModule(false)
 
     install(CachingHeaders)
     install(DefaultHeaders)
@@ -68,13 +66,7 @@ fun Application.module() {
             v1Ad()
             v1Offer()
         }
-        route("v2") {
-            v2Ad()
-            v2Offer()
-        }
 
-        static("static") {
-            resources("static")
-        }
+        staticResources("static", "static")
     }
 }
