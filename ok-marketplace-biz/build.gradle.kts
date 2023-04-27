@@ -4,8 +4,9 @@ plugins {
 
 kotlin {
     jvm {}
-    macosX64 {}
     linuxX64 {}
+    macosX64 {}
+    macosArm64 {}
 
     sourceSets {
         val coroutinesVersion: String by project
