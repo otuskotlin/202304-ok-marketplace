@@ -27,7 +27,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.cio.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 fun Application.moduleJvm() {
     val processor = MkplAdProcessor()
-    commonModule(false, processor)
+    commonModule(processor)
 
     install(CachingHeaders)
     install(DefaultHeaders)
@@ -44,14 +44,6 @@ fun Application.moduleJvm() {
         anyHost() // TODO remove
     }
 
-    install(ContentNegotiation) {
-        jackson {
-            setConfig(apiV1Mapper.serializationConfig)
-            setConfig(apiV1Mapper.deserializationConfig)
-        }
-    }
-
-
     install(CallLogging) {
         level = Level.INFO
     }
@@ -65,6 +57,13 @@ fun Application.moduleJvm() {
         }
 
         route("v1") {
+            install(ContentNegotiation) {
+                jackson {
+                    setConfig(apiV1Mapper.serializationConfig)
+                    setConfig(apiV1Mapper.deserializationConfig)
+                }
+            }
+
             v1Ad(processor)
             v1Offer(processor)
         }

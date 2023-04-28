@@ -12,18 +12,16 @@ import ru.otus.otuskotlin.marketplace.app.v2.v2Ad
 import ru.otus.otuskotlin.marketplace.app.v2.v2Offer
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 
-fun Application.module(includeContentNegotiation: Boolean = true, processor: MkplAdProcessor = MkplAdProcessor()) {
-    if (includeContentNegotiation) {
-        install(ContentNegotiation) {
-            json(apiV2Mapper)
-        }
-    }
-
+fun Application.module(processor: MkplAdProcessor = MkplAdProcessor()) {
     routing {
         get("/") {
             call.respondText("Hello, world!")
         }
         route("v2") {
+            install(ContentNegotiation) {
+                json(apiV2Mapper)
+            }
+
             v2Ad(processor)
             v2Offer(processor)
         }
