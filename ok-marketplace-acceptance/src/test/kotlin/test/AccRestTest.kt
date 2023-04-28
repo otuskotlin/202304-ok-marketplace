@@ -2,6 +2,7 @@ package ru.otus.otuskotlin.marketplace.blackbox.test
 
 import fixture.client.RestClient
 import io.kotest.core.annotation.Ignored
+import ru.otus.otuskotlin.marketplace.blackbox.docker.KtorDockerCompose
 import ru.otus.otuskotlin.marketplace.blackbox.docker.SpringDockerCompose
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.BaseFunSpec
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.docker.DockerCompose
@@ -15,4 +16,4 @@ open class AccRestTestBase(dockerCompose: DockerCompose) : BaseFunSpec(dockerCom
 })
 
 class AccRestSpringTest : AccRestTestBase(SpringDockerCompose)
-// TODO class AccRestKtorTest : AccRestTestBase(KtorDockerCompose)
+class AccRestKtorTest : AccRestTestBase(KtorDockerCompose)
