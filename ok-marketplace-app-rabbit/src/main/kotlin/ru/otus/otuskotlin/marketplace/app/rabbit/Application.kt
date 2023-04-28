@@ -9,7 +9,9 @@ import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 
 
 fun main() {
-    val config = RabbitConfig()
+    val config = RabbitConfig(
+        host = System.getenv("RABBIT_HOST") ?: RabbitConfig.HOST,
+    )
     val adProcessor = MkplAdProcessor()
 
     val producerConfigV1 = RabbitExchangeConfiguration(
