@@ -33,8 +33,14 @@ ktor {
     }
 }
 
+jib {
+    container.mainClass = "io.ktor.server.cio.EngineMain"
+}
+
 kotlin {
-    jvm {}
+    jvm {
+        withJava()
+    }
     linuxX64 {}
     macosX64 {}
     macosArm64 {}
