@@ -12,14 +12,10 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdDeleteRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdOffersRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateRequest
-import ru.otus.otuskotlin.marketplace.api.v1.models.IResponse
+import ru.otus.otuskotlin.markeplace.springapp.config.CorConfig
 import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.api.v1.models.*
+import ru.otus.otuskotlin.marketplace.backend.repo.sql.RepoAdSQL
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
@@ -45,6 +41,9 @@ internal class AdControllerTest {
         every { appSettings.processor } returns processor
         every { appSettings.logger } returns MpLoggerProvider()
     }
+
+    @MockkBean
+    private lateinit var repo: RepoAdSQL
 
     @Test
     fun createAd() = testStubAd(
