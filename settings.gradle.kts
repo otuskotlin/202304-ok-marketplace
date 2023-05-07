@@ -1,7 +1,4 @@
 rootProject.name = "ok-marketplace"
-include("m1l1-hello")
-include("m1l2-basic")
-include("m1l3-oop")
 
 pluginManagement {
     val kotlinVersion: String by settings
@@ -9,3 +6,8 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion apply false
     }
 }
+
+include("m1l1-hello")
+include("m1l2-basic")
+include("m1l3-oop")
+include("m1l4-dsl")
