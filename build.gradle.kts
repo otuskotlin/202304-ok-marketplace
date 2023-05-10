@@ -1,8 +1,14 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
 }
 
+
 allprojects {
+    group = "ru.otus.otuskotlin.marketplace"
+    version = "1.0-SNAPSHOT"
+
     repositories {
         google()
         mavenCentral()
@@ -11,10 +17,7 @@ allprojects {
 }
 
 subprojects {
-    group = "ru.otus"
-    version = "1.0-SNAPSHOT"
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
     }
 }
