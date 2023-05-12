@@ -16,6 +16,10 @@ plugins {
     kotlin("multiplatform")
     id("io.ktor.plugin")
 }
+dependencies {
+    implementation("io.ktor:ktor-server-core-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-websockets-jvm:2.2.4")
+}
 
 repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
