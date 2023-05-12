@@ -20,6 +20,7 @@ import ru.otus.otuskotlin.marketplace.app.v1.v1Ad
 import ru.otus.otuskotlin.marketplace.app.v1.v1Offer
 import ru.otus.otuskotlin.marketplace.app.v1.wsHandlerV1
 import ru.otus.otuskotlin.marketplace.app.v2.wsHandlerV2
+import ru.otus.otuskotlin.marketplace.app.ws.wsChat
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import java.time.Duration
 import ru.otus.otuskotlin.marketplace.app.module as commonModule
@@ -87,6 +88,10 @@ fun Application.moduleJvm() {
 
         static("static") {
             resources("static")
+        }
+
+        webSocket("/ws/chat") {
+            wsChat()
         }
     }
 }

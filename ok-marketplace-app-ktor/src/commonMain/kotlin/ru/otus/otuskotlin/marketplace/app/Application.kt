@@ -12,6 +12,8 @@ import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.app.v2.v2Ad
 import ru.otus.otuskotlin.marketplace.app.v2.v2Offer
 import ru.otus.otuskotlin.marketplace.app.v2.wsHandlerV2
+import ru.otus.otuskotlin.marketplace.app.ws.wsChat
+import ru.otus.otuskotlin.marketplace.app.ws.wsPing
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 
 fun Application.module(processor: MkplAdProcessor = MkplAdProcessor(), installPlugins: Boolean = true) {
@@ -34,6 +36,14 @@ fun Application.module(processor: MkplAdProcessor = MkplAdProcessor(), installPl
 
         webSocket("/ws/v2") {
             wsHandlerV2(processor)
+        }
+
+        webSocket("/ws/ping") {
+            wsPing()
+        }
+
+        webSocket("/ws/chat") {
+            wsChat()
         }
     }
 }
