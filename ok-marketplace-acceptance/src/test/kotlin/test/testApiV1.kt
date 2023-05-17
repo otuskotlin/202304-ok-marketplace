@@ -10,8 +10,8 @@ import ru.otus.otuskotlin.marketplace.api.v1.models.DealSide
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
 import ru.otus.otuskotlin.marketplace.blackbox.test.action.v1.*
 
-fun FunSpec.testApiV1(client: Client) {
-    context("v1") {
+fun FunSpec.testApiV1(client: Client, prefix: String = "") {
+    context("${prefix}v1") {
         test("Create Ad ok") {
             client.createAd()
         }

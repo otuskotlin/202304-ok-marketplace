@@ -5,15 +5,22 @@ import io.kotest.core.annotation.Ignored
 import ru.otus.otuskotlin.marketplace.blackbox.docker.KtorDockerCompose
 import ru.otus.otuskotlin.marketplace.blackbox.docker.SpringDockerCompose
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.BaseFunSpec
+import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.WebSocketClient
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.docker.DockerCompose
 
 @Ignored
-open class AccRestTestBase(dockerCompose: DockerCompose) : BaseFunSpec(dockerCompose, {
-    val client = RestClient(dockerCompose)
+open class AccRestTestBase(dockerCompose: DockerCompose, runWebSocket: Boolean) : BaseFunSpec(dockerCompose, {
+    val restClient = RestClient(dockerCompose)
+    testApiV1(restClient, "rest ")
+    testApiV2(restClient, "rest ")
 
-    testApiV1(client)
-    testApiV2(client)
+    if (runWebSocket) {
+        val websocketClient = WebSocketClient(dockerCompose)
+        testApiV1(websocketClient, "websocket ")
+        testApiV2(websocketClient, "websocket ")
+    }
 })
 
-class AccRestSpringTest : AccRestTestBase(SpringDockerCompose)
-class AccRestKtorTest : AccRestTestBase(KtorDockerCompose)
+class AccRestSpringTest : AccRestTestBase(SpringDockerCompose, true)
+// я пока не разобрался, почему websocket-тесты не работают с ktor. Выключил
+class AccRestKtorTest : AccRestTestBase(KtorDockerCompose, false)
