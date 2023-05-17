@@ -10,6 +10,7 @@ dependencies {
     val logbackVersion: String by project
     val kotlinLoggingJvmVersion: String by project
     val rabbitVersion: String by project
+    val kafkaVersion: String by project
 
     implementation(kotlin("stdlib"))
 
@@ -25,6 +26,7 @@ dependencies {
     testImplementation("io.kotest:kotest-property:$kotestVersion")
 
     implementation("com.rabbitmq:amqp-client:$rabbitVersion")
+    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
@@ -42,5 +44,6 @@ tasks {
         dependsOn(":ok-marketplace-app-spring:dockerBuildImage")
         dependsOn(":ok-marketplace-app-ktor:publishImageToLocalRegistry")
         dependsOn(":ok-marketplace-app-rabbit:dockerBuildImage")
+        dependsOn(":ok-marketplace-app-kafka:dockerBuildImage")
     }
 }
