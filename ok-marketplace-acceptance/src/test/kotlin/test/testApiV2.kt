@@ -4,14 +4,14 @@ import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchFilter
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateObject
-import ru.otus.otuskotlin.marketplace.api.v1.models.DealSide
+import ru.otus.otuskotlin.marketplace.api.v2.models.AdSearchFilter
+import ru.otus.otuskotlin.marketplace.api.v2.models.AdUpdateObject
+import ru.otus.otuskotlin.marketplace.api.v2.models.DealSide
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
-import ru.otus.otuskotlin.marketplace.blackbox.test.action.v1.*
+import ru.otus.otuskotlin.marketplace.blackbox.test.action.v2.*
 
-fun FunSpec.testApiV1(client: Client) {
-    context("v1") {
+fun FunSpec.testApiV2(client: Client) {
+    context("v2") {
         test("Create Ad ok") {
             client.createAd()
         }

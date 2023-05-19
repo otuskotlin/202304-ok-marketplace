@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.serialization")
+    id("com.bmuschko.docker-spring-boot-application")
 }
 
 dependencies {
@@ -57,4 +58,13 @@ tasks {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+docker {
+    springBootApplication {
+        baseImage.set("openjdk:17")
+        ports.set(listOf(8080))
+        images.set(setOf("${project.name}:latest"))
+        jvmArgs.set(listOf("-XX:+UseContainerSupport"))
+    }
 }
