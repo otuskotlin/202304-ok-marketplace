@@ -3,25 +3,24 @@ package ru.otus.otuskotlin.marketplace.blackbox.test.action.v1
 import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
 import io.kotest.matchers.should
-import io.kotest.matchers.shouldBe
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
 
-suspend fun Client.createAd(ad: AdCreateObject = someCreateAd): AdResponseObject = createAd(ad) {
+suspend fun Client.offersAd(id: String?): List<AdResponseObject> = offersAd(id) {
     it should haveSuccessResult
-    it.ad shouldBe adStub
-    it.ad!!
+    it.ads ?: listOf()
 }
 
-suspend fun <T> Client.createAd(ad: AdCreateObject = someCreateAd, block: (AdCreateResponse) -> T): T =
-    withClue("createAdV1: $ad") {
+suspend fun <T> Client.offersAd(id: String?, block: (AdOffersResponse) -> T): T =
+    withClue("searchOffersV1: $id") {
         val response = sendAndReceive(
-            "ad/create", AdCreateRequest(
-                requestType = "create",
+            "ad/offers",
+            AdOffersRequest(
+                requestType = "offers",
                 debug = debug,
-                ad = ad
+                ad = AdReadObject(id = id),
             )
-        ) as AdCreateResponse
+        ) as AdOffersResponse
 
         response.asClue(block)
     }

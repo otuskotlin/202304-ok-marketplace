@@ -1,9 +1,9 @@
-package ru.otus.otuskotlin.marketplace.blackbox.test.action.v1
+package ru.otus.otuskotlin.marketplace.blackbox.test.action.v2
 
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.and
-import ru.otus.otuskotlin.marketplace.api.v1.models.*
+import ru.otus.otuskotlin.marketplace.api.v2.models.*
 
 
 fun haveResult(result: ResponseResult) = Matcher<IResponse> {
