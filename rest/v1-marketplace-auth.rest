@@ -2,10 +2,10 @@
 POST http://localhost:8081/auth/realms/otus-marketplace/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id=otus-marketplace-service&grant_type=password&username=otus-test&password=otus-pass
+client_id=otus-marketplace-service&grant_type=password&username=ivan&password=1234
 
 > {% client.global.set("auth_token", response.body.access_token);
-client.global.set("refresh_token", response.body.refresh_token); %}
+    client.global.set("refresh_token", response.body.refresh_token); %}
 
 ### Token by refresh token
 POST http://localhost:8081/auth/realms/otus-marketplace/protocol/openid-connect/token
@@ -46,7 +46,7 @@ Authorization: Bearer {{auth_token}}
     "id": "99999"
   },
   "debug": {
-    "stub": "badId"
+    "mode": "test"
   }
 }
 
@@ -59,10 +59,10 @@ Authorization: Bearer {{auth_token}}
   "requestType": "read",
   "requestId": "12345",
   "ad": {
-    "id": "existed"
+    "id": "b593a453-5e80-4551-80d4-5966417d313c"
   },
   "debug": {
-    "stub": "success"
+    "mode": "test"
   }
 }
 
