@@ -1,4 +1,4 @@
-rootProject.name = "ok-marketplace"
+rootProject.name = "ok-marketplace-202304"
 
 pluginManagement {
     val kotlinVersion: String by settings
