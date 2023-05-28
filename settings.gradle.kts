@@ -14,3 +14,5 @@ pluginManagement {
 //include("m1l5-coroutines")
 //include("m1l6-flows-and-channels")
 //include("m1l7-kmp")
+
+include("ok-marketplace-acceptance")
