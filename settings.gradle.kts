@@ -48,6 +48,7 @@ include("ok-marketplace-mappers-v1")
 include("ok-marketplace-mappers-v2")
 include("ok-marketplace-app-rabbit")
 
+include("ok-marketplace-lib-cor")
 include("ok-marketplace-biz")
 include("ok-marketplace-stubs")
 
