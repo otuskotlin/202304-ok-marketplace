@@ -37,6 +37,7 @@ pluginManagement {
 //include("m1l6-flows-and-channels")
 //include("m1l7-kmp")
 //include("m3l1-spring")
+include("m4l5-validation")
 
 include("ok-marketplace-acceptance")
 
