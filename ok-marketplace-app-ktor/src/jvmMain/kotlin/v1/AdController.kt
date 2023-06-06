@@ -1,60 +1,29 @@
 package ru.otus.otuskotlin.marketplace.app.v1
 
 import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateResponse
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdDeleteRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdDeleteResponse
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadResponse
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchResponse
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateRequest
-import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
-import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
-import ru.otus.otuskotlin.marketplace.common.MkplContext
-import ru.otus.otuskotlin.marketplace.mappers.v1.fromTransport
-import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportDelete
-import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportSearch
-import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportUpdate
-import kotlin.reflect.KClass
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateResponse
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 
-private val clazzCreate: KClass<*> = ApplicationCall::createAd::class
-suspend fun ApplicationCall.createAd(appSettings: MkplAppSettings) = processV1<AdCreateRequest, AdCreateResponse>(
-    processor = appSettings.processor,
-    request = receive<AdCreateRequest>(),
-    logger = appSettings.logger.logger(clazzCreate),
-    logId = "create",
-)
+suspend fun ApplicationCall.createAd(appSettings: MkplAppSettings) : Unit =
+    processV1<AdCreateRequest, AdCreateResponse>(appSettings,  ApplicationCall::createAd::class, "ad-create")
 
-private val clazzRead: KClass<*> = ApplicationCall::readAd::class
-suspend fun ApplicationCall.readAd(appSettings: MkplAppSettings)  = processV1<AdReadRequest, AdReadResponse>(
-    processor = appSettings.processor,
-    request = receive<AdReadRequest>(),
-    logger = appSettings.logger.logger(clazzRead),
-    logId = "read",
-)
+suspend fun ApplicationCall.readAd(appSettings: MkplAppSettings) : Unit =
+    processV1<AdReadRequest, AdReadResponse>(appSettings, ApplicationCall::readAd::class, "ad-read")
 
-suspend fun ApplicationCall.updateAd(processor: MkplAdProcessor) {
-    val request = receive<AdUpdateRequest>()
-    val context = MkplContext()
-    context.fromTransport(request)
-    processor.exec(context)
-    respond(context.toTransportUpdate())
-}
+suspend fun ApplicationCall.updateAd(appSettings: MkplAppSettings) : Unit =
+    processV1<AdUpdateRequest, AdUpdateResponse>(appSettings, ApplicationCall::updateAd::class, "ad-update")
 
-suspend fun ApplicationCall.deleteAd(processor: MkplAdProcessor) {
-    val request = receive<AdDeleteRequest>()
-    val context = MkplContext()
-    context.fromTransport(request)
-    processor.exec(context)
-    respond(context.toTransportDelete())
-}
+suspend fun ApplicationCall.deleteAd(appSettings: MkplAppSettings) : Unit =
+    processV1<AdDeleteRequest, AdDeleteResponse>(appSettings, ApplicationCall::deleteAd::class, "ad-delete")
 
-suspend fun ApplicationCall.searchAd(processor: MkplAdProcessor) {
-    val request = receive<AdSearchRequest>()
-    val context = MkplContext()
-    context.fromTransport(request)
-    processor.exec(context)
-    respond(context.toTransportSearch())
-}
+suspend fun ApplicationCall.searchAd(appSettings: MkplAppSettings) : Unit =
+    processV1<AdSearchRequest, AdSearchResponse>(appSettings, ApplicationCall::searchAd::class, "ad-search")
