@@ -126,23 +126,24 @@ class V1WebsocketStubTest {
     private inline fun <reified T> testMethod(
         request: Any,
         crossinline assertBlock: (T) -> Unit
-    ) = testApplication {
-        val client = createClient {
-            install(WebSockets)
-        }
-
-        client.webSocket("/ws/v1") {
-            withTimeout(3000) {
-                val incame = incoming.receive() as Frame.Text
-                val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
-                assertIs<AdInitResponse>(response)
+    ) {
+        testApplication {
+            val client = createClient {
+                install(WebSockets)
             }
-            send(Frame.Text(apiV1Mapper.writeValueAsString(request)))
-            withTimeout(3000) {
-                val incame = incoming.receive() as Frame.Text
-                val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
 
-                assertBlock(response)
+            client.webSocket("/ws/v1") {
+                withTimeout(3000) {
+                    val incame = incoming.receive() as Frame.Text
+                    val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
+                    assertIs<AdInitResponse>(response)
+                }
+                send(Frame.Text(apiV1Mapper.writeValueAsString(request)))
+                withTimeout(3000) {
+                    val incame = incoming.receive() as Frame.Text
+                    val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
+                    assertBlock(response)
+                }
             }
         }
     }

@@ -2,10 +2,9 @@ package ru.otus.otuskotlin.marketplace.app.v1
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 
 fun Route.v1Ad(appSettings: MkplAppSettings) {
-    val processor = appSettings.processor
     route("ad") {
         post("create") {
             call.createAd(appSettings)
@@ -14,13 +13,13 @@ fun Route.v1Ad(appSettings: MkplAppSettings) {
             call.readAd(appSettings)
         }
         post("update") {
-            call.updateAd(processor)
+            call.updateAd(appSettings)
         }
         post("delete") {
-            call.deleteAd(processor)
+            call.deleteAd(appSettings)
         }
         post("search") {
-            call.searchAd(processor)
+            call.searchAd(appSettings)
         }
     }
 }

@@ -16,11 +16,12 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import org.slf4j.event.Level
 import ru.otus.otuskotlin.marketplace.api.v1.apiV1Mapper
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.app.plugins.initAppSettings
+import ru.otus.otuskotlin.marketplace.app.v1.WsHandlerV1
 import ru.otus.otuskotlin.marketplace.app.v1.v1Ad
 import ru.otus.otuskotlin.marketplace.app.v1.v1Offer
-import ru.otus.otuskotlin.marketplace.app.v1.wsHandlerV1
-import ru.otus.otuskotlin.marketplace.app.v2.wsHandlerV2
+import ru.otus.otuskotlin.marketplace.app.v2.WsHandlerV2
 import java.time.Duration
 import ru.otus.otuskotlin.marketplace.app.module as commonModule
 
@@ -37,7 +38,6 @@ fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
     }
 
     commonModule(appSettings, false)
-    val processor = appSettings.processor
 
     install(CachingHeaders)
     install(DefaultHeaders)
@@ -61,6 +61,9 @@ fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
     @Suppress("OPT_IN_USAGE")
     install(Locations)
 
+    val wsHandlerV1 = WsHandlerV1()
+    val wsHandlerV2 = WsHandlerV2()
+
     routing {
         get("/") {
             call.respondText("Hello, world!")
@@ -79,10 +82,10 @@ fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
         }
 
         webSocket("/ws/v1") {
-            wsHandlerV1(processor)
+            wsHandlerV1.handle(this, appSettings)
         }
         webSocket("/ws/v2") {
-            wsHandlerV2(processor)
+            wsHandlerV2.handle(this, appSettings)
         }
 
         static("static") {

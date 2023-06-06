@@ -12,6 +12,7 @@ kotlin {
     }
     macosX64 {}
     linuxX64 {}
+    macosArm64 {}
 
     sourceSets {
         val coroutinesVersion: String by project
