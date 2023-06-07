@@ -49,25 +49,17 @@ abstract class RabbitProcessorBase(
     /**
      * Обработка поступившего сообщения в deliverCallback
      */
-    protected abstract suspend fun Channel.processMessage(message: Delivery, context: MkplContext)
-
-    /**
-     * Обработка ошибок
-     */
-    protected abstract fun Channel.onError(e: Throwable, context: MkplContext)
+    protected abstract suspend fun Channel.processMessage(message: Delivery)
 
     /**
      * Callback, который вызывается при доставке сообщения консьюмеру
      */
     private fun Channel.getDeliveryCallback(): DeliverCallback = DeliverCallback { _, message ->
         runBlocking {
-            val context = MkplContext().apply {
-                timeStart = Clock.System.now()
-            }
             kotlin.runCatching {
-                processMessage(message, context)
+                processMessage(message)
             }.onFailure {
-                onError(it, context)
+                println("Failure $it")
             }
         }
     }
