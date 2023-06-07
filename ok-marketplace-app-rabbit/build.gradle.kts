@@ -17,8 +17,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
-    // transport models common
+    // common
     implementation(project(":ok-marketplace-common"))
+    implementation(project(":ok-marketplace-app-common"))
 
     // v1 api
     implementation(project(":ok-marketplace-api-v1-jackson"))
@@ -29,6 +30,8 @@ dependencies {
     implementation(project(":ok-marketplace-api-v2-kmp"))
 
     implementation(project(":ok-marketplace-biz"))
+    // other
+    implementation(project(":ok-marketplace-lib-logging-logback"))
 
     testImplementation("org.testcontainers:rabbitmq:$testContainersVersion")
     testImplementation(kotlin("test"))

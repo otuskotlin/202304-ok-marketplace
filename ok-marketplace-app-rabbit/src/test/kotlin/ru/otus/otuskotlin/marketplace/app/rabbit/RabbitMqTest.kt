@@ -3,6 +3,7 @@ package ru.otus.otuskotlin.marketplace.app.rabbit
 import com.rabbitmq.client.CancelCallback
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DeliverCallback
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.testcontainers.containers.RabbitMQContainer
@@ -34,7 +35,7 @@ import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugMode as AdRequ
 import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugStubs as AdRequestDebugStubsV2
 
 //  TODO-rmq-8: тесты в использованием testcontainers
- class RabbitMqTest {
+class RabbitMqTest {
 
     companion object {
         const val EXCHANGE_TYPE = "direct"
@@ -42,16 +43,14 @@ import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugStubs as AdReq
         const val TRANSPORT_EXCHANGE_V2 = "transport-exchange-v2"
     }
 
-    val container by lazy {
+    val container =
 //            Этот образ предназначен для дебагинга, он содержит панель управления на порту httpPort
 //            RabbitMQContainer("rabbitmq:3-management").apply {
 //            Этот образ минимальный и не содержит панель управления
         RabbitMQContainer("rabbitmq:latest").apply {
             withExposedPorts(5672, 15672)
             withUser(RABBIT_USER, RABBIT_PASSWORD)
-            start()
         }
-    }
     val config by lazy {
         RabbitConfig(
             port = container.getMappedPort(5672),
@@ -96,10 +95,12 @@ import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugStubs as AdReq
             processors = setOf(processorV1, processorV2)
         )
     }
+
     @BeforeTest
     fun tearUp() {
-        println("init controller")
-        GlobalScope.launch {
+        container.start()
+        println("container started")
+        GlobalScope.launch(Dispatchers.IO) {
             controller.start()
         }
         Thread.sleep(6000)
@@ -120,28 +121,28 @@ import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugStubs as AdReq
             password = config.password
         }.newConnection()
         connection1.createChannel().use { channel ->
-                var responseJson = ""
-                channel.exchangeDeclare(processorConfig.exchange, EXCHANGE_TYPE)
-                val queueOut = channel.queueDeclare().queue
-                channel.queueBind(queueOut, processorConfig.exchange, processorConfig.keyOut)
-                val deliverCallback = DeliverCallback { consumerTag, delivery ->
-                    responseJson = String(delivery.body, Charsets.UTF_8)
-                    println(" [x] Received by $consumerTag: '$responseJson'")
-                }
-                channel.basicConsume(queueOut, true, deliverCallback, CancelCallback { })
-
-                channel.basicPublish(processorConfig.exchange, keyIn, null, apiV1Mapper.writeValueAsBytes(boltCreateV1))
-
-                Thread.sleep(3000)
-                // waiting for message processing
-                println("RESPONSE: $responseJson")
-                val response = apiV1Mapper.readValue(responseJson, AdCreateResponse::class.java)
-                val expected = MkplAdStub.get()
-
-                assertEquals(expected.title, response.ad?.title)
-                assertEquals(expected.description, response.ad?.description)
+            var responseJson = ""
+            channel.exchangeDeclare(processorConfig.exchange, EXCHANGE_TYPE)
+            val queueOut = channel.queueDeclare().queue
+            channel.queueBind(queueOut, processorConfig.exchange, processorConfig.keyOut)
+            val deliverCallback = DeliverCallback { consumerTag, delivery ->
+                responseJson = String(delivery.body, Charsets.UTF_8)
+                println(" [x] Received by $consumerTag: '$responseJson'")
             }
+            channel.basicConsume(queueOut, true, deliverCallback, CancelCallback { })
+
+            channel.basicPublish(processorConfig.exchange, keyIn, null, apiV1Mapper.writeValueAsBytes(boltCreateV1))
+
+            Thread.sleep(3000)
+            // waiting for message processing
+            println("RESPONSE: $responseJson")
+            val response = apiV1Mapper.readValue(responseJson, AdCreateResponse::class.java)
+            val expected = MkplAdStub.get()
+
+            assertEquals(expected.title, response.ad?.title)
+            assertEquals(expected.description, response.ad?.description)
         }
+    }
 
     @Test
     fun adCreateTestV2() {
@@ -165,7 +166,12 @@ import ru.otus.otuskotlin.marketplace.api.v2.models.AdRequestDebugStubs as AdReq
                 }
                 channel.basicConsume(queueOut, true, deliverCallback, CancelCallback { })
 
-                channel.basicPublish(processorConfig.exchange, keyIn, null, apiV2RequestSerialize(boltCreateV2).toByteArray())
+                channel.basicPublish(
+                    processorConfig.exchange,
+                    keyIn,
+                    null,
+                    apiV2RequestSerialize(boltCreateV2).toByteArray()
+                )
                 Thread.sleep(3000)
                 // waiting for message processing
 
