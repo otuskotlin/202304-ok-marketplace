@@ -50,6 +50,8 @@ dependencies {
     implementation(project(":ok-marketplace-mappers-v2"))
     // logic
     implementation(project(":ok-marketplace-biz"))
+    // other
+    implementation(project(":ok-marketplace-lib-logging-logback"))
 
     testImplementation(kotlin("test-junit"))
 }
