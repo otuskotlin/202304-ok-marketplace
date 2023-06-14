@@ -50,10 +50,16 @@ class RequestSerializationTest {
     @Test
     fun deserializeNaked() {
         val jsonString = """
-            {"requestId": "123"}
+            {
+            "requestType":"create",
+            "requestId":"123",
+            "debug":{"mode":"stub","stub":"badTitle"},
+            "ad":{"title":"ad title","description":"ad description","adType":"demand","visibility":"public","productId":null}
+            }
         """.trimIndent()
-        val obj = apiV2Mapper.decodeFromString<AdCreateRequest>(jsonString)
+        val obj = apiV2RequestDeserialize(jsonString) as IRequest
 
         assertEquals("123", obj.requestId)
+        assertEquals(request, obj)
     }
 }

@@ -1,64 +1,49 @@
 package ru.otus.otuskotlin.marketplace.api.v2
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
 import ru.otus.otuskotlin.marketplace.api.v2.models.*
 
-@OptIn(ExperimentalSerializationApi::class)
+/**
+ * Добавляйте сюда элементы при появлении новых наследников IRequest / IResponse
+ */
+internal val infos = listOf(
+    info(AdCreateRequest::class, IRequest::class, "create") { copy(requestType = it) },
+    info(AdReadRequest::class, IRequest::class, "read") { copy(requestType = it) },
+    info(AdUpdateRequest::class, IRequest::class, "update") { copy(requestType = it) },
+    info(AdDeleteRequest::class, IRequest::class, "delete") { copy(requestType = it) },
+    info(AdSearchRequest::class, IRequest::class, "search") { copy(requestType = it) },
+    info(AdOffersRequest::class, IRequest::class, "offers") { copy(requestType = it) },
+
+    info(AdCreateResponse::class, IResponse::class, "create") { copy(responseType = it) },
+    info(AdReadResponse::class, IResponse::class, "read") { copy(responseType = it) },
+    info(AdUpdateResponse::class, IResponse::class, "update") { copy(responseType = it) },
+    info(AdDeleteResponse::class, IResponse::class, "delete") { copy(responseType = it) },
+    info(AdSearchResponse::class, IResponse::class, "search") { copy(responseType = it) },
+    info(AdOffersResponse::class, IResponse::class, "offers") { copy(responseType = it) },
+    info(AdInitResponse::class, IResponse::class, "init") { copy(responseType = it) },
+)
+
 val apiV2Mapper = Json {
     classDiscriminator = "_"
     encodeDefaults = true
     ignoreUnknownKeys = true
 
     serializersModule = SerializersModule {
-        polymorphicDefaultSerializer(IRequest::class) {
-            @Suppress("UNCHECKED_CAST")
-            when(it) {
-                is AdCreateRequest ->  RequestSerializer(AdCreateRequest.serializer()) as SerializationStrategy<IRequest>
-                is AdReadRequest   ->  RequestSerializer(AdReadRequest  .serializer()) as SerializationStrategy<IRequest>
-                is AdUpdateRequest ->  RequestSerializer(AdUpdateRequest.serializer()) as SerializationStrategy<IRequest>
-                is AdDeleteRequest ->  RequestSerializer(AdDeleteRequest.serializer()) as SerializationStrategy<IRequest>
-                is AdSearchRequest ->  RequestSerializer(AdSearchRequest.serializer()) as SerializationStrategy<IRequest>
-                is AdOffersRequest ->  RequestSerializer(AdOffersRequest.serializer()) as SerializationStrategy<IRequest>
-                else -> null
-            }
-        }
-        polymorphicDefault(IRequest::class) {
-            AdRequestSerializer
-        }
-        polymorphicDefaultSerializer(IResponse::class) {
-            @Suppress("UNCHECKED_CAST")
-            when(it) {
-                is AdCreateResponse ->  ResponseSerializer(AdCreateResponse.serializer()) as SerializationStrategy<IResponse>
-                is AdReadResponse   ->  ResponseSerializer(AdReadResponse  .serializer()) as SerializationStrategy<IResponse>
-                is AdUpdateResponse ->  ResponseSerializer(AdUpdateResponse.serializer()) as SerializationStrategy<IResponse>
-                is AdDeleteResponse ->  ResponseSerializer(AdDeleteResponse.serializer()) as SerializationStrategy<IResponse>
-                is AdSearchResponse ->  ResponseSerializer(AdSearchResponse.serializer()) as SerializationStrategy<IResponse>
-                is AdOffersResponse ->  ResponseSerializer(AdOffersResponse.serializer()) as SerializationStrategy<IResponse>
-                is AdInitResponse   ->  ResponseSerializer(AdInitResponse  .serializer()) as SerializationStrategy<IResponse>
-                else -> null
-            }
-        }
-        polymorphicDefault(IResponse::class) {
-            AdResponseSerializer
-        }
-
-        contextual(AdRequestSerializer)
-        contextual(AdResponseSerializer)
+        setupPolymorphic()
     }
 }
 
-fun Json.encodeResponse(response: IResponse): String = encodeToString(AdResponseSerializer, response)
-
-fun apiV2ResponseSerialize(Response: IResponse): String = apiV2Mapper.encodeToString(AdResponseSerializer, Response)
+fun apiV2RequestSerialize(request: IRequest): String = apiV2Mapper.encodeToString(request)
 
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> apiV2ResponseDeserialize(json: String): T = apiV2Mapper.decodeFromString(AdResponseSerializer, json) as T
+fun <T : IRequest> apiV2RequestDeserialize(json: String): T =
+    apiV2Mapper.decodeFromString<IRequest>(json) as T
 
-fun apiV2RequestSerialize(request: IRequest): String = apiV2Mapper.encodeToString(AdRequestSerializer, request)
+fun apiV2ResponseSerialize(response: IResponse): String = apiV2Mapper.encodeToString(response)
 
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> apiV2RequestDeserialize(json: String): T = apiV2Mapper.decodeFromString(AdRequestSerializer, json) as T
+fun <T : IResponse> apiV2ResponseDeserialize(json: String): T =
+    apiV2Mapper.decodeFromString<IResponse>(json) as T
