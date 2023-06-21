@@ -21,37 +21,13 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
-application {
-    mainClass.set("io.ktor.server.cio.EngineMain")
-}
-
-ktor {
-    docker {
-        localImageName.set(project.name + "-ktor")
-        imageTag.set(project.version.toString())
-        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
-    }
-}
-
-jib {
-    container.mainClass = "io.ktor.server.cio.EngineMain"
-}
-
 kotlin {
     jvm {
         withJava()
     }
-    linuxX64 {}
-    macosX64 {}
-    macosArm64 {}
-
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
-        binaries {
-            executable {
-                entryPoint = "ru.otus.otuskotlin.marketplace.app.main"
-            }
-        }
-    }
+//    linuxX64 {}
+//    macosX64 {}
+//    macosArm64 {}
 
     sourceSets {
         val commonMain by getting {
@@ -59,7 +35,6 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
 
-                implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
                 implementation(ktor("cio")) // "io.ktor:ktor-server-cio:$ktorVersion"
                 implementation(ktor("auth")) // "io.ktor:ktor-server-auth:$ktorVersion"
                 implementation(ktor("auto-head-response")) // "io.ktor:ktor-server-auto-head-response:$ktorVersion"
@@ -68,8 +43,6 @@ kotlin {
                 implementation(ktor("websockets")) // "io.ktor:ktor-server-websockets:$ktorVersion"
                 implementation(ktor("config-yaml")) // "io.ktor:ktor-server-config-yaml:$ktorVersion"
                 implementation(ktor("content-negotiation")) // "io.ktor:ktor-server-content-negotiation:$ktorVersion"
-                implementation(ktor("websockets")) // "io.ktor:ktor-websockets:$ktorVersion"
-                implementation(ktor("auth")) // "io.ktor:ktor-auth:$ktorVersion"
 
                 implementation(project(":ok-marketplace-common"))
                 implementation(project(":ok-marketplace-biz"))
@@ -140,8 +113,4 @@ kotlin {
             }
         }
     }
-}
-
-tasks.withType<Copy> {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
