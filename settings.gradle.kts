@@ -8,7 +8,7 @@ pluginManagement {
     val pluginSpringVersion: String by settings
     val pluginJpa: String by settings
     val ktorVersion: String by settings
-
+    val bmuschkoVersion: String by settings
     plugins {
         kotlin("jvm") version kotlinVersion apply false
 
@@ -20,7 +20,9 @@ pluginManagement {
         kotlin("plugin.jpa") version pluginJpa apply false
 
         id("io.ktor.plugin") version ktorVersion apply false
-
+        id("com.bmuschko.docker-java-application") version bmuschkoVersion apply false
+        id("com.bmuschko.docker-spring-boot-application") version bmuschkoVersion apply false
+        id("com.bmuschko.docker-remote-api") version bmuschkoVersion apply false
         id("org.openapi.generator") version openapiVersion apply false
     }
 }
@@ -42,6 +44,7 @@ include("ok-marketplace-api-v2-kmp")
 include("ok-marketplace-common")
 include("ok-marketplace-mappers-v1")
 include("ok-marketplace-mappers-v2")
+include("ok-marketplace-app-rabbit")
 
 include("ok-marketplace-biz")
 include("ok-marketplace-stubs")
