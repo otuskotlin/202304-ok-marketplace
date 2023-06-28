@@ -8,6 +8,7 @@ pluginManagement {
     val pluginSpringVersion: String by settings
     val pluginJpa: String by settings
     val pluginShadow: String by settings
+    val ktorVersion: String by settings
 
     plugins {
         kotlin("jvm") version kotlinVersion apply false
@@ -18,6 +19,8 @@ pluginManagement {
         id("io.spring.dependency-management") version springDependencyManagementVersion apply false
         kotlin("plugin.spring") version pluginSpringVersion apply false
         kotlin("plugin.jpa") version pluginJpa apply false
+
+        id("io.ktor.plugin") version ktorVersion apply false
 
         id("org.openapi.generator") version openapiVersion apply false
         id("com.github.johnrengelman.shadow") version pluginShadow apply false
@@ -46,5 +49,5 @@ include("ok-marketplace-biz")
 include("ok-marketplace-stubs")
 
 include("ok-marketplace-app-spring")
-
+include("ok-marketplace-app-ktor")
 include("ok-marketplace-app-serverless")
