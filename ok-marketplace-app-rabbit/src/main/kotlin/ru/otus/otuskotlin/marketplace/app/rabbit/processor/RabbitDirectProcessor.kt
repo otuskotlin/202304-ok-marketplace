@@ -22,14 +22,7 @@ class RabbitDirectProcessorV1(
     processorConfig: RabbitExchangeConfiguration,
     private val processor: MkplAdProcessor = MkplAdProcessor(),
 ) : RabbitProcessorBase(config, processorConfig) {
-
-    private val context = MkplContext()
-
-    override suspend fun Channel.processMessage(message: Delivery) {
-        context.apply {
-            timeStart = Clock.System.now()
-        }
-
+    override suspend fun Channel.processMessage(message: Delivery, context: MkplContext) {
         apiV1Mapper.readValue(message.body, IRequest::class.java).run {
             context.fromTransport(this).also {
                 println("TYPE: ${this::class.simpleName}")
@@ -44,7 +37,7 @@ class RabbitDirectProcessorV1(
         }
     }
 
-    override fun Channel.onError(e: Throwable) {
+    override fun Channel.onError(e: Throwable, context: MkplContext) {
         e.printStackTrace()
         context.state = MkplState.FAILING
         context.addError(error = arrayOf(e.asMkplError()))
