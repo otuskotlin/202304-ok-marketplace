@@ -11,7 +11,7 @@ import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import org.junit.Test
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
-import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.app.moduleJvm
 import ru.otus.otuskotlin.marketplace.backend.repo.tests.AdRepositoryMock
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
