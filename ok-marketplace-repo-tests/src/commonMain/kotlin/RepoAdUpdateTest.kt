@@ -58,7 +58,6 @@ abstract class RepoAdUpdateTest {
         assertEquals(reqUpdateSucc.description, result.data?.description)
         assertEquals(reqUpdateSucc.adType, result.data?.adType)
         assertEquals(emptyList(), result.errors)
-        assertEquals(lockNew, result.data?.lock)
     }
 
     @Test

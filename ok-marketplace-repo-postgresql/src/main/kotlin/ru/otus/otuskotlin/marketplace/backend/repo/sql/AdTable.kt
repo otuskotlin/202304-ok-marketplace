@@ -4,12 +4,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
-import ru.otus.otuskotlin.marketplace.common.models.MkplAd
-import ru.otus.otuskotlin.marketplace.common.models.MkplAdId
-import ru.otus.otuskotlin.marketplace.common.models.MkplAdLock
-import ru.otus.otuskotlin.marketplace.common.models.MkplDealSide
-import ru.otus.otuskotlin.marketplace.common.models.MkplUserId
-import ru.otus.otuskotlin.marketplace.common.models.MkplVisibility
+import ru.otus.otuskotlin.marketplace.common.models.*
 
 object AdTable : Table("ad") {
     val id = varchar("id", 128)
@@ -22,7 +17,7 @@ object AdTable : Table("ad") {
 
     override val primaryKey = PrimaryKey(id)
 
-    fun from(res : InsertStatement<Number>) =MkplAd(
+    fun from(res: InsertStatement<Number>) = MkplAd(
         id = MkplAdId(res[id].toString()),
         title = res[title],
         description = res[description],
@@ -32,9 +27,7 @@ object AdTable : Table("ad") {
         lock = MkplAdLock(res[lock])
     )
 
-    // копипаста, можно избавиться, сделав свой интерфейс и обертки над InsertStatement и ResultRow
-    // но ради двух методов нет смысла
-    fun from(res : ResultRow) = MkplAd(
+    fun from(res: ResultRow) = MkplAd(
         id = MkplAdId(res[id].toString()),
         title = res[title],
         description = res[description],

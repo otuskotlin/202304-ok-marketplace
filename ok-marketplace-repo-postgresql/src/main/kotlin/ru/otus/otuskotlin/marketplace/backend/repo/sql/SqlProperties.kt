@@ -5,6 +5,6 @@ open class SqlProperties(
     val user: String = "postgres",
     val password: String = "marketplace-pass",
     val schema: String = "marketplace",
-    // Удалять таблицы при старте - нужно для тестирования
+    // Delete tables at startup - needed for testing
     val dropDatabase: Boolean = false,
 )

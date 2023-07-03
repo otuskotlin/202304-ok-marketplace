@@ -8,6 +8,7 @@ kotlin {
     jvm {}
     macosX64 {}
     linuxX64 {}
+    macosArm64 {}
 
     sourceSets {
         val cache4kVersion: String by project

@@ -1,29 +1,12 @@
 package ru.otus.otuskotlin.marketplace.backend.repo.sql
 
 import com.benasher44.uuid.uuid4
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import ru.otus.otuskotlin.marketplace.common.helpers.asMkplError
-import ru.otus.otuskotlin.marketplace.common.models.MkplAd
-import ru.otus.otuskotlin.marketplace.common.models.MkplAdId
-import ru.otus.otuskotlin.marketplace.common.models.MkplAdLock
-import ru.otus.otuskotlin.marketplace.common.models.MkplDealSide
-import ru.otus.otuskotlin.marketplace.common.models.MkplUserId
-import ru.otus.otuskotlin.marketplace.common.repo.DbAdFilterRequest
-import ru.otus.otuskotlin.marketplace.common.repo.DbAdIdRequest
-import ru.otus.otuskotlin.marketplace.common.repo.DbAdRequest
-import ru.otus.otuskotlin.marketplace.common.repo.DbAdResponse
-import ru.otus.otuskotlin.marketplace.common.repo.DbAdsResponse
-import ru.otus.otuskotlin.marketplace.common.repo.IAdRepository
+import ru.otus.otuskotlin.marketplace.common.models.*
+import ru.otus.otuskotlin.marketplace.common.repo.*
 
 class RepoAdSQL(
     properties: SqlProperties,
@@ -134,6 +117,6 @@ class RepoAdSQL(
             }
             DbAdsResponse(data = res.map { AdTable.from(it) }, isSuccess = true)
         }, {
-          DbAdsResponse.error(it.asMkplError())
+            DbAdsResponse.error(it.asMkplError())
         })
 }
