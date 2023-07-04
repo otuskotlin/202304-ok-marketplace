@@ -21,6 +21,8 @@ springdoc:
       - name: v2
         url: specs-ad-v2.yaml
 
+prod-repository: ${PROD_REPOSITORY:test}
+
 sql:
   url: ${SQL_URL:jdbc:postgresql://localhost:5432/marketplace}
   user: ${SQL_USER:postgres}

@@ -7,9 +7,7 @@ kotlin {
         browser()
         nodejs()
     }
-    jvm {
-
-    }
+    jvm {}
     macosX64 {}
     linuxX64 {}
     macosArm64 {}

@@ -3,8 +3,7 @@ plugins {
     kotlin("multiplatform")
 }
 kotlin {
-    jvm {
-    }
+    jvm {}
     linuxX64 {}
     macosX64 {}
     macosArm64 {}
