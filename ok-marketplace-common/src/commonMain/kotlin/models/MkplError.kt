@@ -5,5 +5,11 @@ data class MkplError(
     val group: String = "",
     val field: String = "",
     val message: String = "",
+    val level: Level = Level.ERROR,
     val exception: Throwable? = null,
-)
+) {
+    enum class Level {
+        ERROR, WARN, INFO
+    }
+
+}

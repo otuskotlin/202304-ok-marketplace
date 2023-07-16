@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_VARIABLE")
-
 import org.jetbrains.kotlin.util.suffixIfNot
 
 val ktorVersion: String by project
@@ -61,6 +59,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+
+                implementation(project(":ok-marketplace-app-common"))
+
                 implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"
 
                 implementation(ktor("core")) // "io.ktor:ktor-server-core:$ktorVersion"

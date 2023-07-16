@@ -16,11 +16,11 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import org.slf4j.event.Level
 import ru.otus.otuskotlin.marketplace.api.v1.apiV1Mapper
+import ru.otus.otuskotlin.marketplace.app.plugins.initAppSettings
 import ru.otus.otuskotlin.marketplace.app.v1.v1Ad
 import ru.otus.otuskotlin.marketplace.app.v1.v1Offer
 import ru.otus.otuskotlin.marketplace.app.v1.wsHandlerV1
 import ru.otus.otuskotlin.marketplace.app.v2.wsHandlerV2
-import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import java.time.Duration
 import ru.otus.otuskotlin.marketplace.app.module as commonModule
 
@@ -28,7 +28,7 @@ import ru.otus.otuskotlin.marketplace.app.module as commonModule
 fun main(args: Array<String>): Unit = io.ktor.server.cio.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
-fun Application.moduleJvm() {
+fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(15)
         timeout = Duration.ofSeconds(15)
@@ -36,8 +36,8 @@ fun Application.moduleJvm() {
         masking = false
     }
 
-    val processor = MkplAdProcessor()
-    commonModule(processor, false)
+    commonModule(appSettings, false)
+    val processor = appSettings.processor
 
     install(CachingHeaders)
     install(DefaultHeaders)

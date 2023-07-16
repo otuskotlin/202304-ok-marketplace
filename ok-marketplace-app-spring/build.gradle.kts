@@ -26,6 +26,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
+    implementation(project(":ok-marketplace-app-common"))
+
     // transport models
     implementation(project(":ok-marketplace-common"))
 
@@ -40,6 +42,12 @@ dependencies {
     // biz
     implementation(project(":ok-marketplace-biz"))
 
+    // other
+    implementation(project(":ok-marketplace-lib-logging-common"))
+    implementation(project(":ok-marketplace-lib-logging-logback"))
+    implementation(project(":ok-marketplace-mappers-log1"))
+    implementation(project(":ok-marketplace-api-log1"))
+
     // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
@@ -49,6 +57,7 @@ dependencies {
 }
 
 tasks {
+    @Suppress("UnstableApiUsage")
     withType<ProcessResources> {
         from("$rootDir/specs") {
             into("/static")
