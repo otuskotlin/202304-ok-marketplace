@@ -48,6 +48,10 @@ dependencies {
     implementation(project(":ok-marketplace-mappers-log1"))
     implementation(project(":ok-marketplace-api-log1"))
 
+    implementation("com.sndyuk:logback-more-appenders:1.8.8")
+    implementation("org.fluentd:fluent-logger:0.3.4")
+
+
     // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
