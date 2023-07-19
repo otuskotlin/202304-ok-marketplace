@@ -133,6 +133,10 @@ kotlin {
                 // transport models
                 implementation(project(":ok-marketplace-api-v1-jackson"))
                 implementation(project(":ok-marketplace-mappers-v1"))
+
+                implementation("com.sndyuk:logback-more-appenders:1.8.8")
+                implementation("org.fluentd:fluent-logger:0.3.4")
+
             }
         }
 
