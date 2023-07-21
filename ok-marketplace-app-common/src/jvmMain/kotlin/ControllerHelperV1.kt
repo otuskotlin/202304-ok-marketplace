@@ -1,9 +1,8 @@
-package ru.otus.otuskotlin.markeplace.springapp.api.v1.controller
+package ru.otus.otuskotlin.marketplace.app.common
 
 import ru.otus.otuskotlin.marketplace.api.logs.mapper.toLog
 import ru.otus.otuskotlin.marketplace.api.v1.models.IRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.IResponse
-import ru.otus.otuskotlin.marketplace.app.common.process
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.logging.common.IMpLogWrapper
 import ru.otus.otuskotlin.marketplace.mappers.v1.fromTransport

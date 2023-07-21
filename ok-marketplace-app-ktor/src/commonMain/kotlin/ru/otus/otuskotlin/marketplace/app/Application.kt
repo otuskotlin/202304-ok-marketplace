@@ -29,8 +29,8 @@ fun Application.module(appSettings: MkplAppSettings = initAppSettings(), install
                 json(apiV2Mapper)
             }
 
-            v2Ad(processor)
-            v2Offer(processor)
+            v2Ad(appSettings)
+            v2Offer(appSettings)
         }
 
         webSocket("/ws/v2") {

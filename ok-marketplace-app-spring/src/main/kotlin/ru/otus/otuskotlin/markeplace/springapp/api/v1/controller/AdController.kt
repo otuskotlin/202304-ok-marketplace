@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.*
 import ru.otus.otuskotlin.markeplace.springapp.models.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
+import ru.otus.otuskotlin.marketplace.app.common.processV1
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.mappers.v1.*
 

@@ -31,6 +31,9 @@ dependencies {
     val atomicfuVersion: String by project
     val logbackVersion: String by project
     val kotlinLoggingJvmVersion: String by project
+
+    implementation(project(":ok-marketplace-app-common"))
+
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
