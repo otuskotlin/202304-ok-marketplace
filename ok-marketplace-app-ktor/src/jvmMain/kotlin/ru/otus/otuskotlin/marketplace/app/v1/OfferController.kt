@@ -2,17 +2,16 @@ package ru.otus.otuskotlin.marketplace.app.v1
 
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
-import ru.otus.otuskotlin.marketplace.api.v1.models.AdOffersRequest
-import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
-import ru.otus.otuskotlin.marketplace.common.MkplContext
-import ru.otus.otuskotlin.marketplace.mappers.v1.fromTransport
-import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportOffers
+import ru.otus.otuskotlin.marketplace.api.v2.models.AdOffersRequest
+import ru.otus.otuskotlin.marketplace.api.v2.models.AdOffersResponse
+import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.app.common.processV2
+import kotlin.reflect.KClass
 
-suspend fun ApplicationCall.offersAd(processor: MkplAdProcessor) {
-    val request = receive<AdOffersRequest>()
-    val context = MkplContext()
-    context.fromTransport(request)
-    processor.exec(context)
-    respond(context.toTransportOffers())
-}
+private val clazzOffers: KClass<*> = ApplicationCall::offersAd::class
+suspend fun ApplicationCall.offersAd(appSettings: MkplAppSettings) = processV2<AdOffersRequest, AdOffersResponse>(
+    processor = appSettings.processor,
+    request = receive<AdOffersRequest>(),
+    logger = appSettings.logger.logger(clazzOffers),
+    logId = "offers",
+)

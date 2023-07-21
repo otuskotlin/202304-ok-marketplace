@@ -74,8 +74,8 @@ fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
                 }
             }
 
-            v1Ad(processor)
-            v1Offer(processor)
+            v1Ad(appSettings)
+            v1Offer(appSettings)
         }
 
         webSocket("/ws/v1") {
