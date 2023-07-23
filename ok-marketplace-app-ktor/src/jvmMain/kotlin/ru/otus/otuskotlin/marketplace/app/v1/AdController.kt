@@ -3,18 +3,20 @@ package ru.otus.otuskotlin.marketplace.app.v1
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import ru.otus.otuskotlin.marketplace.api.v1.models.*
-import ru.otus.otuskotlin.marketplace.api.v2.models.AdCreateRequest
-import ru.otus.otuskotlin.marketplace.api.v2.models.AdCreateResponse
-import ru.otus.otuskotlin.marketplace.api.v2.models.AdReadRequest
-import ru.otus.otuskotlin.marketplace.api.v2.models.AdReadResponse
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateResponse
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdDeleteRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadResponse
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateRequest
 import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
-import ru.otus.otuskotlin.marketplace.app.v2.createAd
-import ru.otus.otuskotlin.marketplace.app.v2.processV1
-import ru.otus.otuskotlin.marketplace.app.v2.readAd
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplContext
-import ru.otus.otuskotlin.marketplace.mappers.v1.*
+import ru.otus.otuskotlin.marketplace.mappers.v1.fromTransport
+import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportDelete
+import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportSearch
+import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportUpdate
 import kotlin.reflect.KClass
 
 private val clazzCreate: KClass<*> = ApplicationCall::createAd::class

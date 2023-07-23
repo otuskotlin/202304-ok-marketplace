@@ -5,7 +5,6 @@ import io.ktor.server.request.*
 import ru.otus.otuskotlin.marketplace.api.v2.models.AdOffersRequest
 import ru.otus.otuskotlin.marketplace.api.v2.models.AdOffersResponse
 import ru.otus.otuskotlin.marketplace.app.MkplAppSettings
-import ru.otus.otuskotlin.marketplace.app.common.processV2
 import kotlin.reflect.KClass
 
 private val clazzOffers: KClass<*> = ApplicationCall::offersAd::class
