@@ -1,11 +1,8 @@
 package ru.otus.otuskotlin.markeplace.springapp.api.v1.controller
 
-import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.*
-import ru.otus.otuskotlin.markeplace.springapp.models.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
-import ru.otus.otuskotlin.marketplace.app.common.processV1
-import ru.otus.otuskotlin.marketplace.common.MkplContext
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.mappers.v1.*
 
 @RestController
@@ -13,51 +10,24 @@ import ru.otus.otuskotlin.marketplace.mappers.v1.*
 class AdController(
     private val appSettings: MkplAppSettings
 ) {
-
+    private val logger by lazy { appSettings.logger.logger(AdController::class) }
     @PostMapping("create")
-    // Перевести на WebFlux
-    fun createAd(@RequestBody request: AdCreateRequest): AdCreateResponse = runBlocking {
-        processV1<AdCreateRequest, AdCreateResponse>(
-            processor = appSettings.processor,
-            request = request,
-            logger = appSettings.logger.logger(this::class.qualifiedName ?: "create"),
-            logId = "create",
-        )
-    }
+    suspend fun createAd(@RequestBody request: AdCreateRequest): AdCreateResponse =
+        processV1(appSettings, request, logger, "ad-create")
 
     @PostMapping("read")
-// Перевести на WebFlux
-    fun readAd(@RequestBody request: AdReadRequest): AdReadResponse = runBlocking {
-        val context = MkplContext()
-        context.fromTransport(request)
-        appSettings.processor.exec(context)
-        context.toTransportRead()
-    }
+    suspend fun  readAd(@RequestBody request: AdReadRequest): AdReadResponse =
+        processV1(appSettings, request, logger, "ad-read")
 
     @RequestMapping("update", method = [RequestMethod.POST])
-// Перевести на WebFlux
-    fun updateAd(@RequestBody request: AdUpdateRequest): AdUpdateResponse = runBlocking {
-        val context = MkplContext()
-        context.fromTransport(request)
-        appSettings.processor.exec(context)
-        context.toTransportUpdate()
-    }
+    suspend fun  updateAd(@RequestBody request: AdUpdateRequest): AdUpdateResponse =
+        processV1(appSettings, request, logger, "ad-update")
 
     @PostMapping("delete")
-// Перевести на WebFlux
-    fun deleteAd(@RequestBody request: AdDeleteRequest): AdDeleteResponse = runBlocking {
-        val context = MkplContext()
-        context.fromTransport(request)
-        appSettings.processor.exec(context)
-        context.toTransportDelete()
-    }
+    suspend fun  deleteAd(@RequestBody request: AdDeleteRequest): AdDeleteResponse =
+        processV1(appSettings, request, logger, "ad-delete")
 
     @PostMapping("search")
-// Перевести на WebFlux
-    fun searchAd(@RequestBody request: AdSearchRequest): AdSearchResponse = runBlocking {
-        val context = MkplContext()
-        context.fromTransport(request)
-        appSettings.processor.exec(context)
-        context.toTransportSearch()
-    }
+    suspend fun  searchAd(@RequestBody request: AdSearchRequest): AdSearchResponse =
+        processV1(appSettings, request, logger, "ad-search")
 }

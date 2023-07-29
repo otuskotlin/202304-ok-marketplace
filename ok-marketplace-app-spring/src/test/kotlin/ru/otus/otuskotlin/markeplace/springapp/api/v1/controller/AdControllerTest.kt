@@ -1,22 +1,28 @@
 package ru.otus.otuskotlin.markeplace.springapp.api.v1.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.junit.jupiter.api.Disabled
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdCreateRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdDeleteRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdOffersRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdReadRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdSearchRequest
 import ru.otus.otuskotlin.marketplace.api.v1.models.AdUpdateRequest
+import ru.otus.otuskotlin.marketplace.api.v1.models.IResponse
+import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplContext
+import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
 import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportCreate
 import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportDelete
 import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportOffers
@@ -24,18 +30,21 @@ import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportRead
 import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportSearch
 import ru.otus.otuskotlin.marketplace.mappers.v1.toTransportUpdate
 
-// TODO
-@Disabled
-@WebMvcTest(AdController::class, OfferController::class)
+@WebFluxTest(AdController::class, OfferController::class)
 internal class AdControllerTest {
     @Autowired
-    private lateinit var mvc: MockMvc
+    private lateinit var webClient: WebTestClient
 
-    @Autowired
-    private lateinit var mapper: ObjectMapper
+    @MockkBean(relaxUnitFun = true)
+    private lateinit var appSettings: MkplAppSettings
 
-    //@MockBean
-    //private lateinit var processor: MkplAdBlockingProcessor
+    private val processor = mockk<MkplAdProcessor>(relaxUnitFun = true)
+
+    @BeforeEach
+    fun beforeEach() {
+        every { appSettings.processor } returns processor
+        every { appSettings.logger } returns MpLoggerProvider()
+    }
 
     @Test
     fun createAd() = testStubAd(
@@ -79,20 +88,23 @@ internal class AdControllerTest {
         MkplContext().toTransportOffers()
     )
 
-    private fun <Req : Any, Res : Any> testStubAd(
+    private inline fun <reified Req : Any, reified Res : IResponse> testStubAd(
         url: String,
         requestObj: Req,
         responseObj: Res,
     ) {
-        val request = mapper.writeValueAsString(requestObj)
-        val response = mapper.writeValueAsString(responseObj)
-
-        mvc.perform(
-            post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(request)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(response))
+        webClient
+            .post()
+            .uri(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(requestObj))
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(Res::class.java)
+            .value {
+                println("RESPONSE: $it")
+                assertThat(it).isEqualTo(responseObj)
+            }
+        coVerify { processor.exec(any()) }
     }
 }
