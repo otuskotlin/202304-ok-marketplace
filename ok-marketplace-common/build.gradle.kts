@@ -18,6 +18,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
 
+                api(project(":ok-marketplace-lib-logging-common"))
+
                 api("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
             }
         }

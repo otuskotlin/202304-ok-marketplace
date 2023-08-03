@@ -13,13 +13,14 @@ import ru.otus.otuskotlin.marketplace.biz.validation.validateTitleNotEmpty
 import ru.otus.otuskotlin.marketplace.biz.validation.validation
 import ru.otus.otuskotlin.marketplace.biz.workers.*
 import ru.otus.otuskotlin.marketplace.common.MkplContext
+import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.common.models.MkplAdId
 import ru.otus.otuskotlin.marketplace.common.models.MkplCommand
 import ru.otus.otuskotlin.marketplace.cor.rootChain
 import ru.otus.otuskotlin.marketplace.cor.worker
 
-class MkplAdProcessor() {
-    suspend fun exec(ctx: MkplContext) = BusinessChain.exec(ctx)
+class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
+    suspend fun exec(ctx: MkplContext) = BusinessChain.exec(ctx.apply { this.settings = this@MkplAdProcessor.settings })
 
     companion object {
         private val BusinessChain = rootChain<MkplContext> {

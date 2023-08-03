@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
+import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
 import ru.otus.otuskotlin.marketplace.logging.jvm.mpLoggerLogback
 
@@ -13,7 +14,12 @@ class AppConfig {
     fun loggerProvider(): MpLoggerProvider = MpLoggerProvider { mpLoggerLogback(it) }
 
     @Bean
-    fun processor() = MkplAdProcessor()
+    fun processor() = MkplAdProcessor(corSettings())
+
+    @Bean
+    fun corSettings(): MkplCorSettings = MkplCorSettings(
+        loggerProvider = loggerProvider(),
+    )
 
     @Bean
     fun appSettings() = MkplAppSettings(
