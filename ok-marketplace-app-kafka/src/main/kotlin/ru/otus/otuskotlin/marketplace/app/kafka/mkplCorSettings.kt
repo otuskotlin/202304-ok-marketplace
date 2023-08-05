@@ -1,11 +1,9 @@
 package ru.otus.otuskotlin.marketplace.app.kafka
 
+import ru.otus.otuskotlin.marketplace.app.common.LoggerType
 import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
-import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
-import ru.otus.otuskotlin.marketplace.logging.jvm.mpLoggerLogback
-
-private val loggerProvider = MpLoggerProvider { mpLoggerLogback(it) }
+import ru.otus.otuskotlin.marketplace.app.common.getLoggerProviderConf
 
 val corSettings = MkplAppSettings(
-    logger = loggerProvider
+    logger = getLoggerProviderConf(LoggerType.LOGBACK)
 )

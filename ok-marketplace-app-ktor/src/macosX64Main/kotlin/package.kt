@@ -1,1 +1,0 @@
-package ru.otus.otuskotlin.marketplace.app.plugins

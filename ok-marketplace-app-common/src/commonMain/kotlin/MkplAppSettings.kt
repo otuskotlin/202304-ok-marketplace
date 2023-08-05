@@ -8,3 +8,11 @@ data class MkplAppSettings(
     val processor: MkplAdProcessor = MkplAdProcessor(),
     val logger: MpLoggerProvider
 )
+
+enum class LoggerType {
+    KMP,
+    KERMIT,
+    LOGBACK
+}
+
+expect fun getLoggerProviderConf(loggerType: LoggerType): MpLoggerProvider
