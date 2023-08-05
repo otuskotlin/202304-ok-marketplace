@@ -1,6 +1,7 @@
 package ru.otus.otuskotlin.marketplace.app.common
 
 import kotlinx.datetime.Clock
+import ru.otus.otuskotlin.marketplace.api.logs.mapper.toLog
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.common.helpers.asMkplError
@@ -12,8 +13,7 @@ suspend fun <T> MkplAdProcessor.process(
     logger: IMpLogWrapper,
     logId: String,
     fromTransport: suspend MkplContext.() -> Unit,
-    sendResponse: suspend MkplContext.() -> T,
-    toLog: MkplContext.(logId: String) -> Any): T {
+    sendResponse: suspend MkplContext.() -> T): T {
     var command = MkplCommand.NONE
     return try {
         val ctx = MkplContext(

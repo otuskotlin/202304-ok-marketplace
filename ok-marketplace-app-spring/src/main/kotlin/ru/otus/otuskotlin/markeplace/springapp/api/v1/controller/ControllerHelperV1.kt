@@ -16,6 +16,5 @@ suspend inline fun <reified Q : IRequest, reified R : IResponse> processV1(
     logId: String,
 ): R  = appSettings.processor.process(logger, logId,
         fromTransport = { fromTransport(request) },
-        sendResponse = { toTransportAd() as R },
-        toLog = { toLog("spring") }
+        sendResponse = { toTransportAd() as R }
     )

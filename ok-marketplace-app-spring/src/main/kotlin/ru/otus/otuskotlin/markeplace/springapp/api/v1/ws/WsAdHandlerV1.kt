@@ -33,8 +33,7 @@ class WsAdHandlerV1(
                 sendResponse = {
                     val msg = apiV1Mapper.writeValueAsString(toTransportInit())
                     session.sendMessage(TextMessage(msg))
-                },
-                toLog = { toLog("ws-init") })
+                })
         }
     }
 
@@ -54,9 +53,6 @@ class WsAdHandlerV1(
                     } else {
                         session.sendMessage(TextMessage(result))
                     }
-                },
-                {
-                    toLog("ws-v1")
                 })
         }
     }

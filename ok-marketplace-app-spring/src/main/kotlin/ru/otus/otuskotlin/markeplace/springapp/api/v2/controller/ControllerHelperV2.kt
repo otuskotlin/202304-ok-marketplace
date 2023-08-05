@@ -22,6 +22,5 @@ suspend inline fun <reified Q : IRequest, @Suppress("unused") reified R : IRespo
         val request = apiV2Mapper.decodeFromString<Q>(requestString)
         fromTransport(request)
     },
-    sendResponse = {  apiV2Mapper.encodeToString(toTransportAd()) },
-    toLog = { toLog("spring") }
+    sendResponse = {  apiV2Mapper.encodeToString(toTransportAd()) }
 )

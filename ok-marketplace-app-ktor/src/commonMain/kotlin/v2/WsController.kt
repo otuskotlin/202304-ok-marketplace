@@ -37,8 +37,7 @@ class WsHandlerV2 {
             sendResponse = {
                 val init = apiV2ResponseSerialize(toTransportInit())
                 session.outgoing.send(Frame.Text(init))
-            },
-            toLog = { toLog("init") }
+            }
         )
 
 
@@ -73,8 +72,7 @@ class WsHandlerV2 {
                             sessions.clear()
                         }
                     }
-                },
-                toLog = { toLog("webSocket") })
+                })
         }.collect()
     }
 }

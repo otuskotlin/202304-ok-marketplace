@@ -63,8 +63,7 @@ class AppKafkaConsumer(
 
                     processor.process(logger, "kafka",
                         { strategy.deserialize(record.value(), this) },
-                        { sendResponse(this, strategy, outputTopic) },
-                        { toLog("kafka") })
+                        { sendResponse(this, strategy, outputTopic) })
                 }
             }
         } catch (ex: WakeupException) {

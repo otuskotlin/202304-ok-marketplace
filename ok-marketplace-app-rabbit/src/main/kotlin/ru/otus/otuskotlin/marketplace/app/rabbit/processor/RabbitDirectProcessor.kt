@@ -43,7 +43,6 @@ class RabbitDirectProcessorV1(
                 }.also {
                     println("published")
                 }
-            },
-            { toLog("rabbit") })
+            })
     }
 }

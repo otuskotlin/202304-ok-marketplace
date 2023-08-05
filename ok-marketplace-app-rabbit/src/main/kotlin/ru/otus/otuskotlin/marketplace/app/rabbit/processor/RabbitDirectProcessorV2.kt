@@ -42,8 +42,7 @@ class RabbitDirectProcessorV2(
                 }.also {
                     println("published")
                 }
-            },
-            { toLog("rabbit-v2" ) })
+            })
     }
 }
 

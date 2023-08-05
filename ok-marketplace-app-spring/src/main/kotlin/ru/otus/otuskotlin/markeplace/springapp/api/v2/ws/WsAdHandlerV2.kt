@@ -35,8 +35,7 @@ class WsAdHandlerV2(
                 sendResponse = {
                     val msg = apiV2Mapper.encodeToString(toTransportInit())
                     session.sendMessage(TextMessage(msg))
-                },
-                toLog = { toLog("ws-init") })
+                })
         }
     }
 
@@ -56,9 +55,6 @@ class WsAdHandlerV2(
                     } else {
                         session.sendMessage(TextMessage(result))
                     }
-                },
-                {
-                    toLog("ws-v1")
                 })
         }
     }

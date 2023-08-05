@@ -22,7 +22,6 @@ suspend inline fun <reified Q : IRequest, @Suppress("unused") reified R : IRespo
             val request = receive<Q>()
             fromTransport(request)
         },
-        sendResponse = { respond(toTransportAd()) },
-        toLog = { toLog(logId) }
+        sendResponse = { respond(toTransportAd()) }
     )
 }
