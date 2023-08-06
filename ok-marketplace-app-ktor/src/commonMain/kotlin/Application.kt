@@ -11,15 +11,13 @@ import io.ktor.server.websocket.*
 import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
 import ru.otus.otuskotlin.marketplace.app.plugins.initAppSettings
+import ru.otus.otuskotlin.marketplace.app.plugins.initPlugins
 import ru.otus.otuskotlin.marketplace.app.v2.WsHandlerV2
 import ru.otus.otuskotlin.marketplace.app.v2.v2Ad
 import ru.otus.otuskotlin.marketplace.app.v2.v2Offer
 
-fun Application.module(appSettings: MkplAppSettings = initAppSettings(), installPlugins: Boolean = true) {
-    if (installPlugins) {
-        install(WebSockets)
-    }
-
+fun Application.module(appSettings: MkplAppSettings = initAppSettings()) {
+    initPlugins(appSettings)
     val wsHandlerV2 = WsHandlerV2()
 
     routing {
