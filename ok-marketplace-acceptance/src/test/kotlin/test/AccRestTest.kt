@@ -8,7 +8,7 @@ import ru.otus.otuskotlin.marketplace.blackbox.fixture.BaseFunSpec
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.WebSocketClient
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.docker.DockerCompose
 
-@Ignored
+
 open class AccRestTestBase(dockerCompose: DockerCompose, runWebSocket: Boolean) : BaseFunSpec(dockerCompose, {
     val restClient = RestClient(dockerCompose)
     testApiV1(restClient, "rest ")

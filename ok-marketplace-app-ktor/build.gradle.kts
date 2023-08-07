@@ -85,6 +85,7 @@ kotlin {
                 implementation(project(":ok-marketplace-api-v2-kmp"))
                 implementation(project(":ok-marketplace-mappers-v2"))
                 implementation(project(":ok-marketplace-repo-in-memory"))
+                implementation(project(":ok-marketplace-repo-stubs"))
                 // Stubs
                 implementation(project(":ok-marketplace-stubs"))
 

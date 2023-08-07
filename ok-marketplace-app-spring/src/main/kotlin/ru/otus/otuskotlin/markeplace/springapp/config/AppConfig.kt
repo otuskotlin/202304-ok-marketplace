@@ -26,9 +26,9 @@ class AppConfig {
     )
 
     @Bean
-    fun appSettings() = MkplAppSettings(
+    fun appSettings(corSettings: MkplCorSettings) = MkplAppSettings(
         processor = processor(),
         logger = loggerProvider(),
-        corSettings = MkplCorSettings()
+        corSettings = corSettings
     )
 }
