@@ -37,22 +37,7 @@ fun Application.moduleJvm(appSettings: MkplAppSettings = initAppSettings()) {
         masking = false
     }
 
-    commonModule(appSettings, false)
-
-    install(CachingHeaders)
-    install(DefaultHeaders)
-    install(AutoHeadResponse)
-
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader("MyCustomHeader")
-        allowCredentials = true
-        anyHost() // TODO remove
-    }
+    commonModule(appSettings)
 
     install(CallLogging) {
         level = Level.INFO

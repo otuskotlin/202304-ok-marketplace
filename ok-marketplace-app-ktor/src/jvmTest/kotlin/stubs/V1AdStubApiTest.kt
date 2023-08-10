@@ -38,6 +38,7 @@ class V1AdStubApiTest {
         println(responseObj)
         assertEquals(200, response.status.value)
         assertEquals("666", responseObj.ad?.id)
+        assertEquals("КРУТЕЙШИЙ", responseObj.ad?.description)
     }
 
     @Test

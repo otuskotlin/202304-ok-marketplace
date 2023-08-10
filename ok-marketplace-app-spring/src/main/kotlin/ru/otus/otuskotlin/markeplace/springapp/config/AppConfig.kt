@@ -7,6 +7,7 @@ import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
 import ru.otus.otuskotlin.marketplace.logging.jvm.mpLoggerLogback
+import ru.otus.otuskotlin.marketplace.repo.inmemory.AdRepoInMemory
 
 @Configuration
 class AppConfig {
@@ -19,11 +20,15 @@ class AppConfig {
     @Bean
     fun corSettings(): MkplCorSettings = MkplCorSettings(
         loggerProvider = loggerProvider(),
+        repoStub = AdRepoInMemory(),
+        repoProd = AdRepoInMemory(),
+        repoTest = AdRepoInMemory(),
     )
 
     @Bean
-    fun appSettings() = MkplAppSettings(
+    fun appSettings(corSettings: MkplCorSettings) = MkplAppSettings(
         processor = processor(),
         logger = loggerProvider(),
+        corSettings = corSettings
     )
 }

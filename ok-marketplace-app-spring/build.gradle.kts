@@ -30,6 +30,7 @@ dependencies {
 
     // transport models
     implementation(project(":ok-marketplace-common"))
+    implementation(project(":ok-marketplace-repo-in-memory"))
 
     // v1 api
     implementation(project(":ok-marketplace-api-v1-jackson"))
