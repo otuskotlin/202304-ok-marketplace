@@ -3,24 +3,15 @@ package ru.otus.otuskotlin.marketplace.biz.validation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.otus.otuskotlin.marketplace.backend.repository.inmemory.AdRepoStub
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
-import ru.otus.otuskotlin.marketplace.biz.validation.validation.validationIdCorrect
-import ru.otus.otuskotlin.marketplace.biz.validation.validation.validationIdEmpty
-import ru.otus.otuskotlin.marketplace.biz.validation.validation.validationIdFormat
-import ru.otus.otuskotlin.marketplace.biz.validation.validation.validationIdTrim
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.common.models.MkplCommand
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class BizValidationReadTest {
+class BizValidationOffersTest {
 
-    private val command = MkplCommand.READ
-    private val settings by lazy {
-        MkplCorSettings(
-            repoTest = AdRepoStub()
-        )
-    }
-    private val processor by lazy { MkplAdProcessor(settings) }
+    private val command = MkplCommand.OFFERS
+    private val processor = MkplAdProcessor(MkplCorSettings(repoTest = AdRepoStub()))
 
     @Test fun correctId() = validationIdCorrect(command, processor)
     @Test fun trimId() = validationIdTrim(command, processor)
