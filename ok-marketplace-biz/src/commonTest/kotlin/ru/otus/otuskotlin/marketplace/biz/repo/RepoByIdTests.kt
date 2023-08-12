@@ -1,4 +1,4 @@
-package repo
+package ru.otus.otuskotlin.marketplace.biz.repo
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -50,6 +50,8 @@ fun repoNotFoundTest(command: MkplCommand) = runTest {
             description = "xyz",
             adType = MkplDealSide.DEMAND,
             visibility = MkplVisibility.VISIBLE_TO_GROUP,
+            lock = MkplAdLock("123-234-abc-ABC"),
+
         ),
     )
     processor.exec(ctx)

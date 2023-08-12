@@ -34,6 +34,9 @@ kotlin {
                 implementation(project(":ok-marketplace-repo-in-memory"))
 
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+
+                implementation(project(":ok-marketplace-repo-tests"))
+                implementation(project(":ok-marketplace-repo-stubs"))
             }
         }
         @Suppress("UNUSED_VARIABLE")

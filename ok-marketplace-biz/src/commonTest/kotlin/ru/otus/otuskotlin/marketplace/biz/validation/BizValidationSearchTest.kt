@@ -1,4 +1,4 @@
-package ru.otus.otuskotlin.marketplace.biz.validation.validation
+package ru.otus.otuskotlin.marketplace.biz.validation
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -6,7 +6,10 @@ import ru.otus.otuskotlin.marketplace.backend.repository.inmemory.AdRepoStub
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
-import ru.otus.otuskotlin.marketplace.common.models.*
+import ru.otus.otuskotlin.marketplace.common.models.MkplAdFilter
+import ru.otus.otuskotlin.marketplace.common.models.MkplCommand
+import ru.otus.otuskotlin.marketplace.common.models.MkplState
+import ru.otus.otuskotlin.marketplace.common.models.MkplWorkMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -15,12 +18,7 @@ import kotlin.test.assertNotEquals
 class BizValidationSearchTest {
 
     private val command = MkplCommand.SEARCH
-    private val settings by lazy {
-        MkplCorSettings(
-            repoTest = AdRepoStub()
-        )
-    }
-    private val processor by lazy { MkplAdProcessor(settings) }
+    private val processor = MkplAdProcessor(MkplCorSettings(repoTest = AdRepoStub()))
 
     @Test
     fun correctEmpty() = runTest {

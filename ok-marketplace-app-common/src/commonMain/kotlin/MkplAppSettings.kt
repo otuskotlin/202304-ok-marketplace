@@ -6,7 +6,7 @@ import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
 
 data class MkplAppSettings(
     val appUrls: List<String> = emptyList(),
-    val corSettings: MkplCorSettings=MkplCorSettings(),
-    val processor: MkplAdProcessor = MkplAdProcessor(),
+    val corSettings: MkplCorSettings = MkplCorSettings(),
+    val processor: MkplAdProcessor = MkplAdProcessor(settings = corSettings),
     val logger: MpLoggerProvider = MpLoggerProvider()
 )

@@ -13,11 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-const val COMMON_REQUEST_ID = "12345"
 class V2AdInmemoryApiTest {
-    private val uuidOld = "10000000-0000-0000-0000-000000000001"
-
-
     private val createAd = AdCreateObject(
         title = "Болт",
         description = "КРУТЕЙШИЙ",
@@ -72,6 +68,7 @@ class V2AdInmemoryApiTest {
             description = "КРУТЕЙШИЙ",
             adType = DealSide.DEMAND,
             visibility = AdVisibility.PUBLIC,
+            lock = initObject.ad?.lock,
         )
 
         val response = client.post("/v2/ad/update") {
@@ -105,6 +102,7 @@ class V2AdInmemoryApiTest {
                 requestId = "12345",
                 ad = AdDeleteObject(
                     id = id,
+                    lock = initObject.ad?.lock,
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
@@ -154,11 +152,12 @@ class V2AdInmemoryApiTest {
 
     @Test
     fun offers() = testApplication {
+        val oldId = initObject(client).ad?.id
         val response = client.post("/v2/ad/offers") {
             val requestObj = AdOffersRequest(
                 requestId = COMMON_REQUEST_ID,
                 ad = AdReadObject(
-                    id = uuidOld,
+                    id = oldId,
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,

@@ -1,4 +1,4 @@
-package repo
+package ru.otus.otuskotlin.marketplace.app.repo
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -13,9 +13,9 @@ import org.junit.Test
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+
 const val COMMON_REQUEST_ID = "12345"
 class V1AdInmemoryApiTest {
-
     private val createAd = AdCreateObject(
         title = "Болт",
         description = "КРУТЕЙШИЙ",
@@ -64,12 +64,15 @@ class V1AdInmemoryApiTest {
     fun update() = testApplication {
         val client = myClient()
 
+        val created = initObject(client)
+
         val adUpdate = AdUpdateObject(
-            id = initObject(client).ad?.id,
+            id = created.ad?.id,
             title = "Болт",
             description = "КРУТЕЙШИЙ",
             adType = DealSide.DEMAND,
             visibility = AdVisibility.PUBLIC,
+            lock = created.ad?.lock,
         )
 
         val response = client.post("/v1/ad/update") {
@@ -95,13 +98,14 @@ class V1AdInmemoryApiTest {
     @Test
     fun delete() = testApplication {
         val client = myClient()
-        val oldId = initObject(client).ad?.id
+        val created = initObject(client)
 
         val response = client.post("/v1/ad/delete") {
             val requestObj = AdDeleteRequest(
                 requestId = "12345",
                 ad = AdDeleteObject(
-                    id = oldId,
+                    id = created.ad?.id,
+                    lock = created.ad?.lock
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
@@ -112,7 +116,7 @@ class V1AdInmemoryApiTest {
         }
         val responseObj = response.body<AdDeleteResponse>()
         assertEquals(200, response.status.value)
-        assertEquals(oldId, responseObj.ad?.id)
+        assertEquals(created.ad?.id, responseObj.ad?.id)
     }
 
     @Test
@@ -158,12 +162,12 @@ class V1AdInmemoryApiTest {
         assertEquals(COMMON_REQUEST_ID, responseObj.requestId)
     }
     private suspend fun initObject(client: HttpClient): AdCreateResponse {
-        val responseСreate = client.post("/v1/ad/create") {
+        val responseCreate = client.post("/v1/ad/create") {
             contentType(ContentType.Application.Json)
             setBody(requestCreateObj)
         }
-        assertEquals(200, responseСreate.status.value)
-        return responseСreate.body<AdCreateResponse>()
+        assertEquals(200, responseCreate.status.value)
+        return responseCreate.body<AdCreateResponse>()
     }
 
     private fun ApplicationTestBuilder.myClient() = createClient {

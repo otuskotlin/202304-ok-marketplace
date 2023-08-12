@@ -16,10 +16,17 @@ data class MkplAd(
     var views: Int = 0,
     var timePublished: Instant = Instant.NONE,
     var timeUpdated: Instant = Instant.NONE,
+    var lock: MkplAdLock = MkplAdLock.NONE,
     val permissionsClient: MutableSet<MkplAdPermissionClient> = mutableSetOf()
 ) {
     fun deepCopy(): MkplAd = copy(
         permissionsClient = permissionsClient.toMutableSet(),
     )
+
+    fun isEmpty() = this == NONE
+
+    companion object {
+        val NONE = MkplAd()
+    }
 }
 
