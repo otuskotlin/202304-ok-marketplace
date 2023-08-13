@@ -64,6 +64,8 @@ include("ok-marketplace-app-kafka")
 include("ok-marketplace-lib-logging-common")
 include("ok-marketplace-lib-logging-kermit")
 include("ok-marketplace-lib-logging-logback")
+
 include("ok-marketplace-repo-in-memory")
 include("ok-marketplace-repo-stubs")
 include("ok-marketplace-repo-tests")
+include("ok-marketplace-repo-cassandra")
