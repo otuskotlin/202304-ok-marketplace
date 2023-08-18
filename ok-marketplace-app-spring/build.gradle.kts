@@ -43,6 +43,11 @@ dependencies {
     // biz
     implementation(project(":ok-marketplace-biz"))
 
+    // Repo
+    implementation(project(":ok-marketplace-repo-stubs"))
+    implementation(project(":ok-marketplace-repo-in-memory"))
+    implementation(project(":ok-marketplace-repo-postgresql"))
+
     // other
     implementation(project(":ok-marketplace-lib-logging-common"))
     implementation(project(":ok-marketplace-lib-logging-logback"))
@@ -51,7 +56,6 @@ dependencies {
 
     implementation("com.sndyuk:logback-more-appenders:1.8.8")
     implementation("org.fluentd:fluent-logger:0.3.4")
-
 
     // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")

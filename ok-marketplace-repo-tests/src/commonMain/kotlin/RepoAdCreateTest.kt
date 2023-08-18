@@ -8,7 +8,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class RepoAdCreateTest {
     abstract val repo: IAdRepository
