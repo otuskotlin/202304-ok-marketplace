@@ -85,14 +85,18 @@ class RepoAdSQL(
 
     override suspend fun updateAd(rq: DbAdRequest): DbAdResponse =
         update(rq.ad.id, rq.ad.lock) {
-            AdTable.update({ AdTable.id eq rq.ad.id.asString() }) {
+            AdTable.update({
+                (AdTable.id eq rq.ad.id.asString()) and (AdTable.lock eq rq.ad.lock.asString())
+            }) {
                 to(it, rq.ad, randomUuid)
             }
             read(rq.ad.id)
         }
 
     override suspend fun deleteAd(rq: DbAdIdRequest): DbAdResponse = update(rq.id, rq.lock) {
-        AdTable.deleteWhere { AdTable.id eq rq.id.asString() }
+        AdTable.deleteWhere {
+            (AdTable.id eq rq.id.asString()) and (AdTable.lock eq rq.lock.asString())
+        }
         DbAdResponse.success(it)
     }
 
@@ -110,7 +114,7 @@ class RepoAdSQL(
                     if (rq.titleFilter.isNotBlank()) {
                         add(
                             (AdTable.title like "%${rq.titleFilter}%")
-                                    or (AdTable.description like "%${rq.titleFilter}%")
+                                or (AdTable.description like "%${rq.titleFilter}%")
                         )
                     }
                 }.reduce { a, b -> a and b }
