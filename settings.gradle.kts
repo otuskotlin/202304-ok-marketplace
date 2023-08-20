@@ -39,7 +39,7 @@ pluginManagement {
 //include("m3l1-spring")
 //include("m4l5-validation")
 
-include("ok-marketplace-acceptance")
+//include("ok-marketplace-acceptance")
 
 include("ok-marketplace-api-v1-jackson")
 include("ok-marketplace-api-v2-kmp")
@@ -70,3 +70,4 @@ include("ok-marketplace-repo-postgresql")
 include("ok-marketplace-repo-stubs")
 include("ok-marketplace-repo-tests")
 include("ok-marketplace-repo-cassandra")
+include("ok-marketplace-repo-gremlin")
