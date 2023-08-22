@@ -27,6 +27,11 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.apache.tinkerpop:gremlin-driver:$tinkerpopVersion")
+    constraints {
+        implementation("org.apache.tinkerpop:gremlin-driver:3.2.2") {
+            because("Uncontrolled Recursion vulnerability pending CVSS allocation")
+        }
+    }
     implementation("com.arcadedb:arcadedb-engine:$arcadeDbVersion")
     implementation("com.arcadedb:arcadedb-network:$arcadeDbVersion")
     implementation("com.arcadedb:arcadedb-gremlin:$arcadeDbVersion")
