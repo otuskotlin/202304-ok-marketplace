@@ -18,6 +18,6 @@ allprojects {
 
 subprojects {
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "11"
     }
 }
