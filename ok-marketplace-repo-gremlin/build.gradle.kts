@@ -17,6 +17,7 @@ dependencies {
     val coroutinesVersion: String by project
     val kmpUUIDVersion: String by project
     val testContainersVersion: String by project
+    val ktorVersion: String by project
 
     implementation(project(":ok-marketplace-common"))
 
@@ -27,17 +28,21 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.apache.tinkerpop:gremlin-driver:$tinkerpopVersion")
-    constraints {
-        implementation("org.apache.tinkerpop:gremlin-driver:3.2.2") {
-            because("Uncontrolled Recursion vulnerability pending CVSS allocation")
-        }
-    }
+//    constraints {
+//        implementation("commons-collections:commons-collections:3.2.2") {
+//            because("Uncontrolled Recursion vulnerability pending CVSS allocation")
+//        }
+//    }
     implementation("com.arcadedb:arcadedb-engine:$arcadeDbVersion")
     implementation("com.arcadedb:arcadedb-network:$arcadeDbVersion")
     implementation("com.arcadedb:arcadedb-gremlin:$arcadeDbVersion")
 
     testImplementation(kotlin("test-junit"))
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("io.ktor:ktor-client-core:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-okhttp-jvm:$ktorVersion")
+
 }
 
 val arcadeDbVersion: String by project
