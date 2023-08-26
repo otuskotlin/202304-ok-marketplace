@@ -70,5 +70,4 @@ include("ok-marketplace-repo-postgresql")
 include("ok-marketplace-repo-stubs")
 include("ok-marketplace-repo-tests")
 include("ok-marketplace-repo-cassandra")
-// Не работает сборка в гитхабе
-//include("ok-marketplace-repo-gremlin")
+include("ok-marketplace-repo-gremlin")
