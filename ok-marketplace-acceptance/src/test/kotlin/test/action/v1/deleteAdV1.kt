@@ -10,7 +10,7 @@ import ru.otus.otuskotlin.marketplace.blackbox.test.action.beValidId
 import ru.otus.otuskotlin.marketplace.blackbox.test.action.beValidLock
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
 
-suspend fun Client.deleteAd(id: String?, lock: String?) {
+suspend fun Client.deleteAd(id: String?, lock: String?, mode: AdDebug = debug) {
     withClue("deleteAdV1: $id, lock: $lock") {
         id should beValidId
         lock should beValidLock
@@ -19,7 +19,7 @@ suspend fun Client.deleteAd(id: String?, lock: String?) {
             "ad/delete",
             AdDeleteRequest(
                 requestType = "delete",
-                debug = debug,
+                debug = mode,
                 ad = AdDeleteObject(id = id, lock = lock)
             )
         ) as AdDeleteResponse

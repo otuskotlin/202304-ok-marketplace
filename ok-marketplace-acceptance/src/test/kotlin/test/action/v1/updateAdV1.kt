@@ -10,8 +10,8 @@ import ru.otus.otuskotlin.marketplace.blackbox.test.action.beValidId
 import ru.otus.otuskotlin.marketplace.blackbox.test.action.beValidLock
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
 
-suspend fun Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject): AdResponseObject =
-    updateAd(id, lock, ad) {
+suspend fun Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject, mode: AdDebug = debug): AdResponseObject =
+    updateAd(id, lock, ad, mode) {
         it should haveSuccessResult
         it.ad shouldNotBe null
         it.ad?.apply {
@@ -27,7 +27,7 @@ suspend fun Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject): AdR
         it.ad!!
     }
 
-suspend fun <T> Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject, block: (AdUpdateResponse) -> T): T =
+suspend fun <T> Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject, mode: AdDebug = debug, block: (AdUpdateResponse) -> T): T =
     withClue("updatedV1: $id, lock: $lock, set: $ad") {
         id should beValidId
         lock should beValidLock
@@ -35,7 +35,7 @@ suspend fun <T> Client.updateAd(id: String?, lock: String?, ad: AdUpdateObject, 
         val response = sendAndReceive(
             "ad/update", AdUpdateRequest(
                 requestType = "update",
-                debug = debug,
+                debug = mode,
                 ad = ad.copy(id = id, lock = lock)
             )
         ) as AdUpdateResponse
