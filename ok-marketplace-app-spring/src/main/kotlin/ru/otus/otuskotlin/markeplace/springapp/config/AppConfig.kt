@@ -1,5 +1,6 @@
 package ru.otus.otuskotlin.markeplace.springapp.config
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -10,6 +11,7 @@ import ru.otus.otuskotlin.marketplace.backend.repo.sql.SqlProperties
 import ru.otus.otuskotlin.marketplace.backend.repository.inmemory.AdRepoStub
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
+import ru.otus.otuskotlin.marketplace.common.repo.IAdRepository
 import ru.otus.otuskotlin.marketplace.logging.common.MpLoggerProvider
 import ru.otus.otuskotlin.marketplace.logging.jvm.mpLoggerLogback
 import ru.otus.otuskotlin.marketplace.repo.inmemory.AdRepoInMemory
@@ -21,19 +23,24 @@ class AppConfig {
     fun loggerProvider(): MpLoggerProvider = MpLoggerProvider { mpLoggerLogback(it) }
 
     @Bean
-    fun processor() = MkplAdProcessor(corSettings())
+    fun processor(corSettings: MkplCorSettings) = MkplAdProcessor(corSettings)
+
 
     @Bean
-    fun corSettings(): MkplCorSettings = MkplCorSettings(
+    fun corSettings(
+        @Qualifier("prodRepository") prodRepository: IAdRepository?,
+        @Qualifier("testRepository") testRepository: IAdRepository,
+        @Qualifier("stubRepository") stubRepository: IAdRepository,
+    ): MkplCorSettings = MkplCorSettings(
         loggerProvider = loggerProvider(),
-        repoStub = AdRepoInMemory(),
-        repoProd = AdRepoInMemory(),
-        repoTest = AdRepoInMemory(),
+        repoStub = stubRepository,
+        repoTest = testRepository,
+        repoProd = prodRepository ?: testRepository,
     )
 
     @Bean
-    fun appSettings(corSettings: MkplCorSettings) = MkplAppSettings(
-        processor = processor(),
+    fun appSettings(corSettings: MkplCorSettings, processor: MkplAdProcessor) = MkplAppSettings(
+        processor = processor,
         logger = loggerProvider(),
         corSettings = corSettings
     )
