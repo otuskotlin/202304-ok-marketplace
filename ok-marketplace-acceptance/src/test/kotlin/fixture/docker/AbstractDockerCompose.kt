@@ -52,11 +52,6 @@ abstract class AbstractDockerCompose(
         log.warn("\n=========== $dockerComposeName complete =========== \n")
     }
 
-    override fun clearDb() {
-        log.warn("===== clearDb =====")
-        // TODO сделать очистку БД, когда до этого дойдет
-    }
-
     override val inputUrl: URLBuilder
         get() = getUrl(0)
 

@@ -2,7 +2,32 @@
 
 version: '3'
 services:
+  psql:
+    image: postgres:14.1-alpine
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: marketplace
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
   app-spring:
     image: ok-marketplace-app-spring:latest
     ports:
       - "8080:8080"
+    environment:
+      PROD_REPOSITORY: sql
+      SQL_URL: jdbc:postgresql://psql:5432/marketplace
+      SQL_USER: user
+      SQL_PASSWORD: password
+    depends_on:
+      psql:
+        condition: service_healthy

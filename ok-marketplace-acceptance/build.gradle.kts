@@ -11,6 +11,7 @@ dependencies {
     val kotlinLoggingJvmVersion: String by project
     val rabbitVersion: String by project
     val kafkaVersion: String by project
+    val postgresDriverVersion: String by project
 
     implementation(kotlin("stdlib"))
 
@@ -34,6 +35,9 @@ dependencies {
     testImplementation("io.ktor:ktor-client-core:$ktorVersion")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-okhttp-jvm:$ktorVersion")
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    testImplementation("org.postgresql:postgresql:$postgresDriverVersion")
 }
 
 var severity: String = "MINOR"

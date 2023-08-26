@@ -8,24 +8,29 @@ import io.kotest.matchers.shouldNotBe
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
 import ru.otus.otuskotlin.marketplace.blackbox.fixture.client.Client
 
-suspend fun Client.createAd(ad: AdCreateObject = someCreateAd): AdResponseObject = createAd(ad) {
-    it should haveSuccessResult
-    it.ad shouldNotBe null
-    it.ad?.apply {
-        title shouldBe ad.title
-        description shouldBe ad.description
-        adType shouldBe ad.adType
-        visibility shouldBe ad.visibility
+suspend fun Client.createAd(ad: AdCreateObject = someCreateAd, mode: AdDebug = debug): AdResponseObject =
+    createAd(ad, mode) {
+        it should haveSuccessResult
+        it.ad shouldNotBe null
+        it.ad?.apply {
+            title shouldBe ad.title
+            description shouldBe ad.description
+            adType shouldBe ad.adType
+            visibility shouldBe ad.visibility
+        }
+        it.ad!!
     }
-    it.ad!!
-}
 
-suspend fun <T> Client.createAd(ad: AdCreateObject = someCreateAd, block: (AdCreateResponse) -> T): T =
+suspend fun <T> Client.createAd(
+    ad: AdCreateObject = someCreateAd,
+    mode: AdDebug = debug,
+    block: (AdCreateResponse) -> T
+): T =
     withClue("createAdV1: $ad") {
         val response = sendAndReceive(
             "ad/create", AdCreateRequest(
                 requestType = "create",
-                debug = debug,
+                debug = mode,
                 ad = ad
             )
         ) as AdCreateResponse
