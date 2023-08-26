@@ -1,0 +1,36 @@
+#  application.yaml работает в jvm и native, но не работает в режиме сервлета с Tomcat
+# в этом случае необходимо сформировать application.conf
+ktor:
+  application:
+    modules:
+      - ru.otus.otuskotlin.marketplace.app.ApplicationJvmKt.moduleJvm
+  deployment:
+    port: 8080
+  urls:
+    - "http://127.0.0.1:8080/"
+    - "http://0.0.0.0:8080/"
+    - "http://192.168.0.182:8080/"
+  watch:
+    - classes
+    - resources
+marketplace:
+  repository:
+    test: "$DB_TYPE_TEST:inmemory"
+    prod: "$DB_TYPE_PROD:inmemory"
+    cassandra:
+      hosts: localhost
+      keyspace: test_keyspace
+      pass: cassandra
+      port: 9042
+      user: cassandra
+    psql:
+      password: marketplace-pass
+      schema: marketplace
+      url: "jdbc:postgresql://localhost:5432/marketplace"
+      user: postgres
+    gremlin:
+      host: "$DB_GREMLIN_HOST:localhost"
+      user: "$DB_GREMLIN_HOST:root"
+      password: "$DB_GREMLIN_HOST:root_root"
+      port: "$DB_GREMLIN_PORT:8182"
+      enableSsl: false
