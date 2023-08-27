@@ -1,8 +1,7 @@
-package ru.otus.otuskotlin.marketplace.app.repo
+package ru.otus.otuskotlin.marketplace.repo
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
-import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -11,29 +10,71 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
 import org.junit.Test
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
+import ru.otus.otuskotlin.marketplace.app.auth.addAuth
+import ru.otus.otuskotlin.marketplace.app.common.AuthConfig
+import ru.otus.otuskotlin.marketplace.app.helpers.testSettings
+import ru.otus.otuskotlin.marketplace.app.moduleJvm
+import ru.otus.otuskotlin.marketplace.common.models.MkplAdId
+import ru.otus.otuskotlin.marketplace.common.models.MkplAdLock
+import ru.otus.otuskotlin.marketplace.common.models.MkplDealSide
+import ru.otus.otuskotlin.marketplace.common.models.MkplVisibility
+import ru.otus.otuskotlin.marketplace.repo.inmemory.AdRepoInMemory
+import ru.otus.otuskotlin.marketplace.stubs.MkplAdStub
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-const val COMMON_REQUEST_ID = "12345"
 class V1AdInmemoryApiTest {
-    private val createAd = AdCreateObject(
-        title = "Болт",
-        description = "КРУТЕЙШИЙ",
-        adType = DealSide.DEMAND,
-        visibility = AdVisibility.PUBLIC,
-    )
-    private val requestCreateObj = AdCreateRequest(
-        requestId = "12345",
-        ad = createAd,
-        debug = AdDebug(
-            mode = AdRequestDebugMode.TEST,
-        )
-    )
+    private val uuidOld = "10000000-0000-0000-0000-000000000001"
+    private val uuidNew = "10000000-0000-0000-0000-000000000002"
+    private val uuidSup = "10000000-0000-0000-0000-000000000003"
+    private val initAd = MkplAdStub.prepareResult {
+        id = MkplAdId(uuidOld)
+        title = "abc"
+        description = "abc"
+        adType = MkplDealSide.DEMAND
+        visibility = MkplVisibility.VISIBLE_PUBLIC
+        lock = MkplAdLock(uuidOld)
+    }
+    private val initAdSupply = MkplAdStub.prepareResult {
+        id = MkplAdId(uuidSup)
+        title = "abc"
+        description = "abc"
+        adType = MkplDealSide.SUPPLY
+        visibility = MkplVisibility.VISIBLE_PUBLIC
+    }
+
+    private val userId = initAd.ownerId
 
     @Test
     fun create() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
-        val responseObj = initObject(client)
+
+        val createAd = AdCreateObject(
+            title = "Болт",
+            description = "КРУТЕЙШИЙ",
+            adType = DealSide.DEMAND,
+            visibility = AdVisibility.PUBLIC,
+        )
+
+        val response = client.post("/v1/ad/create") {
+            val requestObj = AdCreateRequest(
+                requestId = "12345",
+                ad = createAd,
+                debug = AdDebug(
+                    mode = AdRequestDebugMode.TEST,
+                )
+            )
+            contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
+            setBody(requestObj)
+        }
+        val responseObj = response.body<AdCreateResponse>()
+        assertEquals(200, response.status.value)
+        assertEquals(uuidNew, responseObj.ad?.id)
         assertEquals(createAd.title, responseObj.ad?.title)
         assertEquals(createAd.description, responseObj.ad?.description)
         assertEquals(createAd.adType, responseObj.ad?.adType)
@@ -42,37 +83,44 @@ class V1AdInmemoryApiTest {
 
     @Test
     fun read() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
-        val id = initObject(client).ad?.id
+
         val response = client.post("/v1/ad/read") {
             val requestObj = AdReadRequest(
                 requestId = "12345",
-                ad = AdReadObject(id),
+                ad = AdReadObject(uuidOld),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdReadResponse>()
         assertEquals(200, response.status.value)
-        assertEquals(id, responseObj.ad?.id)
+        assertEquals(uuidOld, responseObj.ad?.id)
     }
 
     @Test
     fun update() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
-        val created = initObject(client)
-
         val adUpdate = AdUpdateObject(
-            id = created.ad?.id,
+            id = uuidOld,
             title = "Болт",
             description = "КРУТЕЙШИЙ",
             adType = DealSide.DEMAND,
             visibility = AdVisibility.PUBLIC,
-            lock = created.ad?.lock,
+            lock = initAd.lock.asString(),
         )
 
         val response = client.post("/v1/ad/update") {
@@ -84,6 +132,7 @@ class V1AdInmemoryApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdUpdateResponse>()
@@ -97,32 +146,40 @@ class V1AdInmemoryApiTest {
 
     @Test
     fun delete() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
-        val created = initObject(client)
 
         val response = client.post("/v1/ad/delete") {
             val requestObj = AdDeleteRequest(
                 requestId = "12345",
                 ad = AdDeleteObject(
-                    id = created.ad?.id,
-                    lock = created.ad?.lock
+                    id = uuidOld,
+                    lock = initAd.lock.asString()
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdDeleteResponse>()
         assertEquals(200, response.status.value)
-        assertEquals(created.ad?.id, responseObj.ad?.id)
+        assertEquals(uuidOld, responseObj.ad?.id)
     }
 
     @Test
     fun search() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
-        val initObject = initObject(client)
+
         val response = client.post("/v1/ad/search") {
             val requestObj = AdSearchRequest(
                 requestId = "12345",
@@ -132,42 +189,41 @@ class V1AdInmemoryApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdSearchResponse>()
         assertEquals(200, response.status.value)
         assertNotEquals(0, responseObj.ads?.size)
-        assertEquals(initObject.ad?.id, responseObj.ads?.first()?.id)
+        assertEquals(uuidOld, responseObj.ads?.first()?.id)
     }
 
     @Test
     fun offers() = testApplication {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd, initAdSupply), randomUuid = { uuidNew })
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
-        val oldId = initObject(client).ad?.id
+
         val response = client.post("/v1/ad/offers") {
             val requestObj = AdOffersRequest(
-                requestId = COMMON_REQUEST_ID,
+                requestId = "12345",
                 ad = AdReadObject(
-                    id = oldId,
+                    id = uuidOld,
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdOffersResponse>()
         assertEquals(200, response.status.value)
-        assertEquals(COMMON_REQUEST_ID, responseObj.requestId)
-    }
-    private suspend fun initObject(client: HttpClient): AdCreateResponse {
-        val responseCreate = client.post("/v1/ad/create") {
-            contentType(ContentType.Application.Json)
-            setBody(requestCreateObj)
-        }
-        assertEquals(200, responseCreate.status.value)
-        return responseCreate.body<AdCreateResponse>()
+        assertNotEquals(0, responseObj.ads?.size)
+        assertEquals(uuidSup, responseObj.ads?.first()?.id)
     }
 
     private fun ApplicationTestBuilder.myClient() = createClient {
@@ -180,4 +236,5 @@ class V1AdInmemoryApiTest {
             }
         }
     }
+
 }

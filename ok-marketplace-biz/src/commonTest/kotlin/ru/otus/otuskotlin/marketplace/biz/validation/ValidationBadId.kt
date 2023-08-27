@@ -3,12 +3,15 @@ package ru.otus.otuskotlin.marketplace.biz.validation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
+import ru.otus.otuskotlin.marketplace.biz.addTestPrincipal
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.common.models.*
 import ru.otus.otuskotlin.marketplace.stubs.MkplAdStub
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+
+private val stub = MkplAdStub.prepareResult { id = MkplAdId("123-234-abc-ABC") }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun validationIdCorrect(command: MkplCommand, processor: MkplAdProcessor) = runTest {
@@ -20,6 +23,7 @@ fun validationIdCorrect(command: MkplCommand, processor: MkplAdProcessor) = runT
             lock = MkplAdLock("123-234-abc-ABC")
         }
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(0, ctx.errors.size)
     assertNotEquals(MkplState.FAILING, ctx.state)
@@ -42,6 +46,7 @@ fun validationIdTrim(command: MkplCommand, processor: MkplAdProcessor) = runTest
             lock = MkplAdLock("123-234-abc-ABC"),
         ),
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(0, ctx.errors.size)
     assertNotEquals(MkplState.FAILING, ctx.state)

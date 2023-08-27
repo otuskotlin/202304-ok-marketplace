@@ -1,6 +1,5 @@
-package ru.otus.otuskotlin.marketplace.app.repo
+package ru.otus.otuskotlin.marketplace.app.inmemory
 
-import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -9,27 +8,70 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.api.v2.models.*
+import ru.otus.otuskotlin.marketplace.app.auth.addAuth
+import ru.otus.otuskotlin.marketplace.app.common.AuthConfig
+import ru.otus.otuskotlin.marketplace.app.helpers.testSettings
+import ru.otus.otuskotlin.marketplace.app.module
+import ru.otus.otuskotlin.marketplace.common.models.MkplAdId
+import ru.otus.otuskotlin.marketplace.common.models.MkplAdLock
+import ru.otus.otuskotlin.marketplace.common.models.MkplDealSide
+import ru.otus.otuskotlin.marketplace.common.models.MkplVisibility
+import ru.otus.otuskotlin.marketplace.repo.inmemory.AdRepoInMemory
+import ru.otus.otuskotlin.marketplace.stubs.MkplAdStub
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class V2AdInmemoryApiTest {
-    private val createAd = AdCreateObject(
-        title = "Болт",
-        description = "КРУТЕЙШИЙ",
-        adType = DealSide.DEMAND,
-        visibility = AdVisibility.PUBLIC,
-    )
-    private val requestObj = AdCreateRequest(
-        requestId = "12345",
-        ad = createAd,
-        debug = AdDebug(
-            mode = AdRequestDebugMode.TEST,
-        )
-    )
+    private val uuidOld = "10000000-0000-0000-0000-000000000001"
+    private val uuidNew = "10000000-0000-0000-0000-000000000002"
+    private val uuidSup = "10000000-0000-0000-0000-000000000003"
+    private val initAd = MkplAdStub.prepareResult {
+        id = MkplAdId(uuidOld)
+        title = "abc"
+        description = "abc"
+        adType = MkplDealSide.DEMAND
+        visibility = MkplVisibility.VISIBLE_PUBLIC
+        lock = MkplAdLock(uuidOld)
+    }
+    private val initAdSupply = MkplAdStub.prepareResult {
+        id = MkplAdId(uuidSup)
+        title = "abc"
+        description = "abc"
+        adType = MkplDealSide.SUPPLY
+        visibility = MkplVisibility.VISIBLE_PUBLIC
+    }
+
+    private val userId = initAd.ownerId
+
     @Test
     fun create() = testApplication {
-        val responseObj = initObject(client)
+        application { module(testSettings(AdRepoInMemory(randomUuid = { uuidNew }))) }
+
+        val createAd = AdCreateObject(
+            title = "Болт",
+            description = "КРУТЕЙШИЙ",
+            adType = DealSide.DEMAND,
+            visibility = AdVisibility.PUBLIC,
+        )
+
+        val response = client.post("/v2/ad/create") {
+            val requestObj = AdCreateRequest(
+                requestId = "12345",
+                ad = createAd,
+                debug = AdDebug(
+                    mode = AdRequestDebugMode.TEST,
+                )
+            )
+            contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
+            val requestJson = apiV2Mapper.encodeToString(requestObj)
+            setBody(requestJson)
+        }
+        val responseJson = response.bodyAsText()
+        val responseObj = apiV2Mapper.decodeFromString<AdCreateResponse>(responseJson)
+        assertEquals(200, response.status.value)
+        assertEquals(uuidNew, responseObj.ad?.id)
         assertEquals(createAd.title, responseObj.ad?.title)
         assertEquals(createAd.description, responseObj.ad?.description)
         assertEquals(createAd.adType, responseObj.ad?.adType)
@@ -38,37 +80,44 @@ class V2AdInmemoryApiTest {
 
     @Test
     fun read() = testApplication {
-        val adCreateResponse = initObject(client)
-        val oldId = adCreateResponse.ad?.id
-        val response = client.post("/v2/ad/read") {
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            module(testSettings(repo))
+        }
 
+        val response = client.post("/v2/ad/read") {
             val requestObj = AdReadRequest(
                 requestId = "12345",
-                ad = AdReadObject(oldId),
+                ad = AdReadObject(uuidOld),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             val requestJson = apiV2Mapper.encodeToString(requestObj)
             setBody(requestJson)
         }
         val responseJson = response.bodyAsText()
         val responseObj = apiV2Mapper.decodeFromString<AdReadResponse>(responseJson)
         assertEquals(200, response.status.value)
-        assertEquals(oldId, responseObj.ad?.id)
+        assertEquals(uuidOld, responseObj.ad?.id)
     }
 
     @Test
     fun update() = testApplication {
-        val initObject = initObject(client)
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            module(testSettings(repo))
+        }
+
         val adUpdate = AdUpdateObject(
-            id = initObject.ad?.id,
+            id = uuidOld,
             title = "Болт",
             description = "КРУТЕЙШИЙ",
             adType = DealSide.DEMAND,
             visibility = AdVisibility.PUBLIC,
-            lock = initObject.ad?.lock,
+            lock = initAd.lock.asString(),
         )
 
         val response = client.post("/v2/ad/update") {
@@ -80,6 +129,7 @@ class V2AdInmemoryApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             val requestJson = apiV2Mapper.encodeToString(requestObj)
             setBody(requestJson)
         }
@@ -95,32 +145,40 @@ class V2AdInmemoryApiTest {
 
     @Test
     fun delete() = testApplication {
-        val initObject = initObject(client)
-        val id = initObject.ad?.id
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            module(testSettings(repo))
+        }
+
         val response = client.post("/v2/ad/delete") {
             val requestObj = AdDeleteRequest(
                 requestId = "12345",
                 ad = AdDeleteObject(
-                    id = id,
-                    lock = initObject.ad?.lock,
+                    id = uuidOld,
+                    lock = initAd.lock.asString(),
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             val requestJson = apiV2Mapper.encodeToString(requestObj)
             setBody(requestJson)
         }
         val responseJson = response.bodyAsText()
         val responseObj = apiV2Mapper.decodeFromString<AdDeleteResponse>(responseJson)
         assertEquals(200, response.status.value)
-        assertEquals(id, responseObj.ad?.id)
+        assertEquals(uuidOld, responseObj.ad?.id)
     }
 
     @Test
     fun search() = testApplication {
-        val initObject = initObject(client)
+        val repo = AdRepoInMemory(initObjects = listOf(initAd), randomUuid = { uuidNew })
+        application {
+            module(testSettings(repo))
+        }
+
         val response = client.post("/v2/ad/search") {
             val requestObj = AdSearchRequest(
                 requestId = "12345",
@@ -130,6 +188,7 @@ class V2AdInmemoryApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             val requestJson = apiV2Mapper.encodeToString(requestObj)
             setBody(requestJson)
         }
@@ -137,33 +196,28 @@ class V2AdInmemoryApiTest {
         val responseObj = apiV2Mapper.decodeFromString<AdSearchResponse>(responseJson)
         assertEquals(200, response.status.value)
         assertNotEquals(0, responseObj.ads?.size)
-        assertEquals(initObject.ad?.id, responseObj.ads?.first()?.id)
-    }
-    private suspend fun initObject(client: HttpClient): AdCreateResponse {
-        val response = client.post("/v2/ad/create") {
-            contentType(ContentType.Application.Json)
-            val requestJson = apiV2Mapper.encodeToString(requestObj)
-            setBody(requestJson)
-        }
-        val responseJson = response.bodyAsText()
-        assertEquals(200, response.status.value)
-        return apiV2Mapper.decodeFromString<AdCreateResponse>(responseJson)
+        assertEquals(uuidOld, responseObj.ads?.first()?.id)
     }
 
     @Test
     fun offers() = testApplication {
-        val oldId = initObject(client).ad?.id
+        val repo = AdRepoInMemory(initObjects = listOf(initAd, initAdSupply), randomUuid = { uuidNew })
+        application {
+            module(testSettings(repo))
+        }
+
         val response = client.post("/v2/ad/offers") {
             val requestObj = AdOffersRequest(
-                requestId = COMMON_REQUEST_ID,
+                requestId = "12345",
                 ad = AdReadObject(
-                    id = oldId,
+                    id = uuidOld,
                 ),
                 debug = AdDebug(
                     mode = AdRequestDebugMode.TEST,
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             val requestJson = apiV2Mapper.encodeToString(requestObj)
             setBody(requestJson)
         }
@@ -171,6 +225,6 @@ class V2AdInmemoryApiTest {
         val responseObj = apiV2Mapper.decodeFromString<AdOffersResponse>(responseJson)
         assertEquals(200, response.status.value)
         assertNotEquals(0, responseObj.ads?.size)
-        assertEquals(COMMON_REQUEST_ID, responseObj.requestId)
+        assertEquals(uuidSup, responseObj.ads?.first()?.id)
     }
 }

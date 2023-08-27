@@ -8,6 +8,7 @@ import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
+import ru.otus.otuskotlin.markeplace.springapp.fakeMkplPrincipal
 import ru.otus.otuskotlin.marketplace.api.logs.mapper.toLog
 import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.api.v2.models.IRequest
@@ -31,7 +32,9 @@ class WsAdHandlerV2(
 
         runBlocking {
             settings.processor.process(logger, "ws-init",
-                fromTransport = {},
+                fromTransport = {
+                    principal = fakeMkplPrincipal()
+                },
                 sendResponse = {
                     val msg = apiV2Mapper.encodeToString(toTransportInit())
                     session.sendMessage(TextMessage(msg))
@@ -46,6 +49,7 @@ class WsAdHandlerV2(
                 {
                     val request = apiV2Mapper.decodeFromString<IRequest>(message.payload)
                     fromTransport(request)
+                    principal = fakeMkplPrincipal()
                 },
                 {
                     val result = apiV2Mapper.encodeToString(toTransportAd())

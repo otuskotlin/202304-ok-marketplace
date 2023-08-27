@@ -1,4 +1,4 @@
-package ru.otus.otuskotlin.marketplace.app.stubs
+package ru.otus.otuskotlin.marketplace.stubs
 
 import io.ktor.client.plugins.websocket.*
 import io.ktor.server.testing.*
@@ -6,6 +6,8 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.withTimeout
 import ru.otus.otuskotlin.marketplace.api.v1.apiV1Mapper
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
+import ru.otus.otuskotlin.marketplace.app.helpers.testSettings
+import ru.otus.otuskotlin.marketplace.app.moduleJvm
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -126,24 +128,24 @@ class V1WebsocketStubTest {
     private inline fun <reified T> testMethod(
         request: Any,
         crossinline assertBlock: (T) -> Unit
-    ) {
-        testApplication {
-            val client = createClient {
-                install(WebSockets)
-            }
+    ) = testApplication {
+        application { moduleJvm(testSettings()) }
+        val client = createClient {
+            install(WebSockets)
+        }
 
-            client.webSocket("/ws/v1") {
-                withTimeout(3000) {
-                    val incame = incoming.receive() as Frame.Text
-                    val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
-                    assertIs<AdInitResponse>(response)
-                }
-                send(Frame.Text(apiV1Mapper.writeValueAsString(request)))
-                withTimeout(3000) {
-                    val incame = incoming.receive() as Frame.Text
-                    val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
-                    assertBlock(response)
-                }
+        client.webSocket("/ws/v1") {
+            withTimeout(3000) {
+                val incame = incoming.receive() as Frame.Text
+                val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
+                assertIs<AdInitResponse>(response)
+            }
+            send(Frame.Text(apiV1Mapper.writeValueAsString(request)))
+            withTimeout(3000) {
+                val incame = incoming.receive() as Frame.Text
+                val response = apiV1Mapper.readValue(incame.readText(), T::class.java)
+
+                assertBlock(response)
             }
         }
     }

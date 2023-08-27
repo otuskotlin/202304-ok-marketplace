@@ -1,4 +1,4 @@
-package ru.otus.otuskotlin.marketplace.app.repo
+package ru.otus.otuskotlin.marketplace.repo
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -7,20 +7,19 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import org.junit.Test
 import ru.otus.otuskotlin.marketplace.api.v1.models.*
-import ru.otus.otuskotlin.marketplace.app.common.MkplAppSettings
+import ru.otus.otuskotlin.marketplace.app.common.AuthConfig
+import ru.otus.otuskotlin.marketplace.app.helpers.testSettings
 import ru.otus.otuskotlin.marketplace.app.moduleJvm
+import ru.otus.otuskotlin.marketplace.app.auth.addAuth
 import ru.otus.otuskotlin.marketplace.backend.repo.tests.AdRepositoryMock
-import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.common.models.MkplAd
 import ru.otus.otuskotlin.marketplace.common.models.MkplAdLock
 import ru.otus.otuskotlin.marketplace.common.models.MkplDealSide
 import ru.otus.otuskotlin.marketplace.common.repo.DbAdResponse
 import ru.otus.otuskotlin.marketplace.common.repo.DbAdsResponse
-import ru.otus.otuskotlin.marketplace.common.repo.IAdRepository
 import ru.otus.otuskotlin.marketplace.stubs.MkplAdStub
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -32,15 +31,17 @@ class V1AdMockApiTest {
 
     @Test
     fun create() = testApplication {
-        initRepoTest(AdRepositoryMock(
+        val repo = AdRepositoryMock(
             invokeCreateAd = {
                 DbAdResponse(
                     isSuccess = true,
                     data = it.ad.copy(id = adId),
                 )
             }
-        ))
-
+        )
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
         val createAd = AdCreateObject(
@@ -59,6 +60,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdCreateResponse>()
@@ -72,7 +74,7 @@ class V1AdMockApiTest {
 
     @Test
     fun read() = testApplication {
-        initRepoTest(AdRepositoryMock(
+        val repo = AdRepositoryMock(
             invokeReadAd = {
                 DbAdResponse(
                     isSuccess = true,
@@ -82,8 +84,10 @@ class V1AdMockApiTest {
                     ),
                 )
             }
-        ))
-
+        )
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
         val response = client.post("/v1/ad/read") {
@@ -95,6 +99,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdReadResponse>()
@@ -104,7 +109,7 @@ class V1AdMockApiTest {
 
     @Test
     fun update() = testApplication {
-        initRepoTest(AdRepositoryMock(
+        val repo = AdRepositoryMock(
             invokeReadAd = {
                 DbAdResponse(
                     isSuccess = true,
@@ -121,8 +126,10 @@ class V1AdMockApiTest {
                     data = it.ad.copy(ownerId = userId),
                 )
             }
-        ))
-
+        )
+        application {
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
         val adUpdate = AdUpdateObject(
@@ -150,6 +157,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdUpdateResponse>()
@@ -163,26 +171,29 @@ class V1AdMockApiTest {
 
     @Test
     fun delete() = testApplication {
-        initRepoTest(AdRepositoryMock(
-            invokeReadAd = {
-                DbAdResponse(
-                    isSuccess = true,
-                    data = MkplAd(
-                        id = it.id,
-                        ownerId = userId,
-                    ),
-                )
-            },
-            invokeDeleteAd = {
-                DbAdResponse(
-                    isSuccess = true,
-                    data = MkplAd(
-                        id = it.id,
-                        ownerId = userId,
-                    ),
-                )
-            }
-        ))
+        application {
+            val repo = AdRepositoryMock(
+                invokeReadAd = {
+                    DbAdResponse(
+                        isSuccess = true,
+                        data = MkplAd(
+                            id = it.id,
+                            ownerId = userId,
+                        ),
+                    )
+                },
+                invokeDeleteAd = {
+                    DbAdResponse(
+                        isSuccess = true,
+                        data = MkplAd(
+                            id = it.id,
+                            ownerId = userId,
+                        ),
+                    )
+                }
+            )
+            moduleJvm(testSettings(repo))
+        }
 
         val client = myClient()
 
@@ -200,6 +211,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdDeleteResponse>()
@@ -209,20 +221,24 @@ class V1AdMockApiTest {
 
     @Test
     fun search() = testApplication {
-        initRepoTest(AdRepositoryMock(
-            invokeSearchAd = {
-                DbAdsResponse(
-                    isSuccess = true,
-                    data = listOf(
-                        MkplAd(
-                            title = it.titleFilter,
-                            ownerId = it.ownerId,
-                            adType = it.dealSide,
+        application {
+            val repo =
+                AdRepositoryMock(
+                    invokeSearchAd = {
+                        DbAdsResponse(
+                            isSuccess = true,
+                            data = listOf(
+                                MkplAd(
+                                    title = it.titleFilter,
+                                    ownerId = it.ownerId,
+                                    adType = it.dealSide,
+                                )
+                            ),
                         )
-                    ),
+                    }
                 )
-            }
-        ))
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
         val response = client.post("/v1/ad/search") {
@@ -234,6 +250,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdSearchResponse>()
@@ -243,30 +260,34 @@ class V1AdMockApiTest {
 
     @Test
     fun offers() = testApplication {
-        initRepoTest(AdRepositoryMock(
-            invokeReadAd = {
-                DbAdResponse(
-                    isSuccess = true,
-                    data = MkplAd(id = it.id)
-                )
-            },
-            invokeSearchAd = {
-                DbAdsResponse(
-                    isSuccess = true,
-                    data = listOf(
-                        MkplAd(
-                            title = it.titleFilter,
-                            ownerId = it.ownerId,
-                            adType = when (it.dealSide) {
-                                MkplDealSide.DEMAND -> MkplDealSide.SUPPLY
-                                MkplDealSide.SUPPLY -> MkplDealSide.DEMAND
-                                MkplDealSide.NONE -> MkplDealSide.NONE
-                            },
+        application {
+            val repo =
+                AdRepositoryMock(
+                    invokeReadAd = {
+                        DbAdResponse(
+                            isSuccess = true,
+                            data = MkplAd(id = it.id)
                         )
-                    ),
+                    },
+                    invokeSearchAd = {
+                        DbAdsResponse(
+                            isSuccess = true,
+                            data = listOf(
+                                MkplAd(
+                                    title = it.titleFilter,
+                                    ownerId = it.ownerId,
+                                    adType = when (it.dealSide) {
+                                        MkplDealSide.DEMAND -> MkplDealSide.SUPPLY
+                                        MkplDealSide.SUPPLY -> MkplDealSide.DEMAND
+                                        MkplDealSide.NONE -> MkplDealSide.NONE
+                                    },
+                                )
+                            ),
+                        )
+                    }
                 )
-            }
-        ))
+            moduleJvm(testSettings(repo))
+        }
         val client = myClient()
 
         val response = client.post("/v1/ad/offers") {
@@ -281,6 +302,7 @@ class V1AdMockApiTest {
                 )
             )
             contentType(ContentType.Application.Json)
+            addAuth(id = userId.asString(), config = AuthConfig.TEST)
             setBody(requestObj)
         }
         val responseObj = response.body<AdOffersResponse>()
@@ -296,15 +318,6 @@ class V1AdMockApiTest {
                 enable(SerializationFeature.INDENT_OUTPUT)
                 writerWithDefaultPrettyPrinter()
             }
-        }
-    }
-
-    private fun ApplicationTestBuilder.initRepoTest(repo: IAdRepository) {
-        environment {
-            config = MapApplicationConfig()
-        }
-        application {
-            moduleJvm(MkplAppSettings(corSettings = MkplCorSettings(repoTest = repo)))
         }
     }
 }
