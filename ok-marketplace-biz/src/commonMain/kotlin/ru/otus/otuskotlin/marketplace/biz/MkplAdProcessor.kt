@@ -4,6 +4,10 @@ import ru.otus.otuskotlin.marketplace.biz.general.initRepo
 import ru.otus.otuskotlin.marketplace.biz.general.operation
 import ru.otus.otuskotlin.marketplace.biz.general.prepareResult
 import ru.otus.otuskotlin.marketplace.biz.general.stubs
+import ru.otus.otuskotlin.marketplace.biz.permissions.accessValidation
+import ru.otus.otuskotlin.marketplace.biz.permissions.chainPermissions
+import ru.otus.otuskotlin.marketplace.biz.permissions.frontPermissions
+import ru.otus.otuskotlin.marketplace.biz.permissions.searchTypes
 import ru.otus.otuskotlin.marketplace.biz.repo.*
 import ru.otus.otuskotlin.marketplace.biz.validation.*
 import ru.otus.otuskotlin.marketplace.biz.workers.*
@@ -44,11 +48,14 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
 
                     finishAdValidation("Завершение проверок")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
                 chain {
                     title = "Логика сохранения"
                     repoPrepareCreate("Подготовка объекта для сохранения")
+                    accessValidation("Вычисление прав доступа")
                     repoCreate("Создание объявления в БД")
                 }
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
                 prepareResult("Подготовка ответа")
             }
             operation("Получить объявление", MkplCommand.READ) {
@@ -66,15 +73,18 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
 
                     finishAdValidation("Успешное завершение процедуры валидации")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
                 chain {
                     title = "Логика чтения"
                     repoRead("Чтение объявления из БД")
+                    accessValidation("Вычисление прав доступа")
                     worker {
                         title = "Подготовка ответа для Read"
                         on { state == MkplState.RUNNING }
                         handle { adRepoDone = adRepoRead }
                     }
                 }
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
                 prepareResult("Подготовка ответа")
             }
             operation("Изменить объявление", MkplCommand.UPDATE) {
@@ -102,14 +112,17 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
                     validateDescriptionHasContent("Проверка на наличие содержания в описании")
 
                     finishAdValidation("Успешное завершение процедуры валидации")
-                    chain {
-                        title = "Логика сохранения"
-                        repoRead("Чтение объявления из БД")
-                        repoPrepareUpdate("Подготовка объекта для обновления")
-                        repoUpdate("Обновление объявления в БД")
-                    }
-                    prepareResult("Подготовка ответа")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
+                chain {
+                    title = "Логика сохранения"
+                    repoRead("Чтение объявления из БД")
+                    accessValidation("Вычисление прав доступа")
+                    repoPrepareUpdate("Подготовка объекта для обновления")
+                    repoUpdate("Обновление объявления в БД")
+                }
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
+                prepareResult("Подготовка ответа")
             }
             operation("Удалить объявление", MkplCommand.DELETE) {
                 stubs("Обработка стабов") {
@@ -129,12 +142,15 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
                     validateLockProperFormat("Проверка формата lock")
                     finishAdValidation("Успешное завершение процедуры валидации")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
                 chain {
                     title = "Логика удаления"
                     repoRead("Чтение объявления из БД")
+                    accessValidation("Вычисление прав доступа")
                     repoPrepareDelete("Подготовка объекта для удаления")
                     repoDelete("Удаление объявления из БД")
                 }
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
                 prepareResult("Подготовка ответа")
             }
             operation("Поиск объявлений", MkplCommand.SEARCH) {
@@ -149,7 +165,11 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
 
                     finishAdFilterValidation("Успешное завершение процедуры валидации")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
+                searchTypes("Подготовка поискового запроса")
+
                 repoSearch("Поиск объявления в БД по фильтру")
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
                 prepareResult("Подготовка ответа")
             }
             operation("Поиск подходящих предложений для объявления", MkplCommand.OFFERS) {
@@ -167,12 +187,15 @@ class MkplAdProcessor(val settings: MkplCorSettings = MkplCorSettings()) {
 
                     finishAdValidation("Успешное завершение процедуры валидации")
                 }
+                chainPermissions("Вычисление разрешений для пользователя")
                 chain {
                     title = "Логика поиска в БД"
                     repoRead("Чтение объявления из БД")
+                    accessValidation("Вычисление прав доступа")
                     repoPrepareOffers("Подготовка данных для поиска предложений")
                     repoOffers("Поиск предложений для объявления в БД")
                 }
+                frontPermissions("Вычисление пользовательских разрешений для фронтенда")
                 prepareResult("Подготовка ответа")
             }
         }.build()

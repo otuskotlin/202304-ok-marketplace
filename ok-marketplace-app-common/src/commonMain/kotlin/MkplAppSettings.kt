@@ -8,5 +8,6 @@ data class MkplAppSettings(
     val appUrls: List<String> = emptyList(),
     val corSettings: MkplCorSettings = MkplCorSettings(),
     val processor: MkplAdProcessor = MkplAdProcessor(settings = corSettings),
-    val logger: MpLoggerProvider = MpLoggerProvider()
+    val logger: MpLoggerProvider = MpLoggerProvider(),
+    val auth: AuthConfig = AuthConfig.NONE,
 )

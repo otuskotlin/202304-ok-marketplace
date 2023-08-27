@@ -3,6 +3,7 @@ package ru.otus.otuskotlin.marketplace.biz.validation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
+import ru.otus.otuskotlin.marketplace.biz.addTestPrincipal
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.common.models.*
 import ru.otus.otuskotlin.marketplace.stubs.MkplAdStub
@@ -27,6 +28,7 @@ fun validationDescriptionCorrect(command: MkplCommand, processor: MkplAdProcesso
             lock = MkplAdLock("123-234-abc-ABC"),
         ),
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(0, ctx.errors.size)
     assertNotEquals(MkplState.FAILING, ctx.state)
@@ -48,6 +50,7 @@ fun validationDescriptionTrim(command: MkplCommand, processor: MkplAdProcessor) 
             lock = MkplAdLock("123-234-abc-ABC"),
         ),
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(0, ctx.errors.size)
     assertNotEquals(MkplState.FAILING, ctx.state)
@@ -69,6 +72,7 @@ fun validationDescriptionEmpty(command: MkplCommand, processor: MkplAdProcessor)
             lock = MkplAdLock("123-234-abc-ABC"),
         ),
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(1, ctx.errors.size)
     assertEquals(MkplState.FAILING, ctx.state)
@@ -92,6 +96,7 @@ fun validationDescriptionSymbols(command: MkplCommand, processor: MkplAdProcesso
             lock = MkplAdLock("123-234-abc-ABC"),
         ),
     )
+    ctx.addTestPrincipal(stub.ownerId)
     processor.exec(ctx)
     assertEquals(1, ctx.errors.size)
     assertEquals(MkplState.FAILING, ctx.state)

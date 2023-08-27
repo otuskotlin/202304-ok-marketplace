@@ -2,6 +2,7 @@ package ru.otus.otuskotlin.markeplace.springapp.api.v2.controller
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import ru.otus.otuskotlin.markeplace.springapp.fakeMkplPrincipal
 import ru.otus.otuskotlin.marketplace.api.logs.mapper.toLog
 import ru.otus.otuskotlin.marketplace.api.v2.apiV2Mapper
 import ru.otus.otuskotlin.marketplace.api.v2.models.IRequest
@@ -21,6 +22,7 @@ suspend inline fun <reified Q : IRequest, @Suppress("unused") reified R : IRespo
     fromTransport = {
         val request = apiV2Mapper.decodeFromString<Q>(requestString)
         fromTransport(request)
+        principal = fakeMkplPrincipal()
     },
     sendResponse = {  apiV2Mapper.encodeToString(toTransportAd()) },
     toLog = { toLog("spring") }

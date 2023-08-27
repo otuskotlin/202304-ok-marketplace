@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import ru.otus.otuskotlin.marketplace.backend.repo.tests.AdRepositoryMock
 import ru.otus.otuskotlin.marketplace.biz.MkplAdProcessor
+import ru.otus.otuskotlin.marketplace.biz.addTestPrincipal
 import ru.otus.otuskotlin.marketplace.common.MkplContext
 import ru.otus.otuskotlin.marketplace.common.MkplCorSettings
 import ru.otus.otuskotlin.marketplace.common.models.*
@@ -54,6 +55,7 @@ fun repoNotFoundTest(command: MkplCommand) = runTest {
 
         ),
     )
+    ctx.addTestPrincipal()
     processor.exec(ctx)
     assertEquals(MkplState.FAILING, ctx.state)
     assertEquals(MkplAd(), ctx.adResponse)
