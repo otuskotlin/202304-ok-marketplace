@@ -30,5 +30,5 @@ private fun Application.initAppAuth(): AuthConfig = AuthConfig(
     audience = environment.config.property("jwt.audience").getString(),
     realm = environment.config.property("jwt.realm").getString(),
     clientId = environment.config.property("jwt.clientId").getString(),
-    certUrl = environment.config.propertyOrNull("jwt.certUrl")?.getString(),
+    certUrl = environment.config.propertyOrNull("jwt.certUrl")?.getString()?.takeIf { it.isNotBlank() },
 )

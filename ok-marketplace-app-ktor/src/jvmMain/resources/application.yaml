@@ -36,8 +36,9 @@ marketplace:
       enableSsl: false
 
 jwt:
-  secret: "secret"
-  issuer: "OtusKotlin"
+  secret: "$JWT_SECRET:"
+  issuer: "$JWT_ISSUER:http://localhost:8081/auth/realms/otus-marketplace"
   audience: "ad-users"
-  realm: "mp-ads"
+  realm: "otus-marketplace"
   clientId: "otus-marketplace-service"
+  certUrl: "$JWT_CERT_URL:http://localhost:8081/auth/realms/otus-marketplace/protocol/openid-connect/certs"
